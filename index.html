@@ -6,31 +6,7 @@
     <title>+5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <link rel="preconne                           let imageUrl;
-                if (exercise.name === 'Elevação Lateral na Polia') {
-                    imageUrl = 'imagens/Elevação Lateral na Polia.gif';
-                } else if (exercise.name === 'Pulley Frente Aberto') {
-                    imageUrl = 'imagens/Pulley Frente Aberto.gif';
-                } else if (exercise.name === 'Puxada Triângulo') {
-                    imageUrl = 'imagens/Puxada Triângulo.gif';
-                } else if (exercise.name === 'Remada Serrote') {
-                    imageUrl = 'imagens/Remada Serrote.gif';
-                } else if (exercise.name === 'Remada Baixa Triângulo') {
-                    imageUrl = 'imagens/Remada Baixa Triângulo.gif';
-                } else {
-                    imageUrl = `https://placehold.co/100x100/1f2937/FFFFFF?text=${encodeURIComponent(exercise.name.split(' ')[0])}&font=inter`;
-                }geUrl;
-                if (exercise.name === 'Elevação Lateral na Polia') {
-                    imageUrl = 'imagens/Elevação Lateral na Polia.gif';
-                } else if (exercise.name === 'Pulley Frente Aberto') {
-                    imageUrl = 'imagens/Pulley Frente Aberto.gif';
-                } else if (exercise.name === 'Puxada Triângulo') {
-                    imageUrl = 'imagens/Puxada Triângulo.gif';
-                } else if (exercise.name === 'Remada Serrote') {
-                    imageUrl = 'imagens/Remada Serrote.gif';
-                } else {
-                    imageUrl = `https://placehold.co/100x100/1f2937/FFFFFF?text=${encodeURIComponent(exercise.name.split(' ')[0])}&font=inter`;
-                }https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -71,13 +47,40 @@
 
         <!-- Header -->
         <header class="text-center mb-10">
-            <div class="relative flex justify-center items-center h-32">
-                <span class="absolute text-9xl md:text-[12rem] font-black text-orange-500 opacity-40 blur-3xl pointer-events-none">5</span>
-                <h1 class="relative text-8xl md:text-9xl font-black text-orange-500 drop-shadow-lg z-10">
-                    +5
-                </h1>
+            <div class="flex justify-center items-center gap-8 flex-wrap">
+                <!-- Title Block -->
+                <div>
+                    <div class="relative flex justify-center items-center h-32">
+                        <span class="absolute text-9xl md:text-[12rem] font-black text-orange-500 opacity-40 blur-3xl pointer-events-none">5</span>
+                        <h1 class="relative text-8xl md:text-9xl font-black text-orange-500 drop-shadow-lg z-10">
+                            +5
+                        </h1>
+                    </div>
+                    <p class="text-gray-400 -mt-2 uppercase tracking-widest">ATÉ O LIMITE, TODO DIA.</p>
+                </div>
+                
+                <!-- Player -->
+                <div id="player" class="flex items-center gap-4">
+                    <div class="relative">
+                        <div class="absolute -inset-1 bg-orange-500 rounded-full blur-lg opacity-60 pointer-events-none"></div>
+                        <button id="play-pause-btn" class="relative z-10 w-10 h-10 flex items-center justify-center bg-orange-500 rounded-full hover:bg-orange-600 transition-colors flex-shrink-0">
+                            <!-- Play Icon -->
+                            <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                            </svg>
+                            <!-- Stop Icon -->
+                            <svg id="stop-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="text-left">
+                        <p class="font-semibold text-white">O Canal Hits Brasil</p>
+                        <p class="text-sm text-gray-400">Hunter.FM</p>
+                    </div>
+                    <audio id="audio-stream" src="https://live.hunter.fm/hitsbrasil_normal" preload="none"></audio>
+                </div>
             </div>
-            <p class="text-gray-400 -mt-2 uppercase tracking-widest">ATÉ O LIMITE, TODO DIA.</p>
         </header>
 
         <!-- Week/Level Stepper -->
@@ -114,7 +117,7 @@
             </button>
         </div>
     </footer>
-
+    
     <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
 
@@ -568,6 +571,26 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadState();
             renderAll();
+            
+            // --- Player Logic ---
+            const audio = document.getElementById('audio-stream');
+            const playPauseBtn = document.getElementById('play-pause-btn');
+            const playIcon = document.getElementById('play-icon');
+            const stopIcon = document.getElementById('stop-icon');
+
+            function togglePlay() {
+                if (audio.paused) {
+                    audio.play().catch(e => console.error("Error playing audio:", e));
+                    playIcon.classList.add('hidden');
+                    stopIcon.classList.remove('hidden');
+                } else {
+                    audio.pause();
+                    playIcon.classList.remove('hidden');
+                    stopIcon.classList.add('hidden');
+                }
+            }
+
+            playPauseBtn.addEventListener('click', togglePlay);
         });
     </script>
 </body>
