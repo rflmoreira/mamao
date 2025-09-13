@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -39,48 +39,54 @@
         .exercise-completed h3 {
             text-decoration: line-through;
         }
+
+        /* Custom styles for input range (volume) */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        input[type="range"]:hover::-webkit-slider-thumb {
+            background: #f0f0f0;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
 
-    <div id="app" class="container mx-auto p-4 md:p-6 max-w-4xl">
+    <div id="main-content" class="container mx-auto p-4 md:p-6 max-w-4xl transition-all duration-500">
 
         <!-- Header -->
         <header class="text-center mb-10">
-            <div class="flex justify-center items-center gap-8 flex-wrap">
-                <!-- Title Block -->
-                <div>
-                    <div class="relative flex justify-center items-center h-32">
-                        <span class="absolute text-9xl md:text-[12rem] font-black text-orange-500 opacity-40 blur-3xl pointer-events-none">5</span>
-                        <h1 class="relative text-8xl md:text-9xl font-black text-orange-500 drop-shadow-lg z-10">
-                            +5
-                        </h1>
-                    </div>
-                    <p class="text-gray-400 -mt-2 uppercase tracking-widest">ATÉ O LIMITE, TODO DIA.</p>
-                </div>
-                
-                <!-- Player -->
-                <div id="player" class="flex items-center gap-4">
-                    <div class="relative">
-                        <div class="absolute -inset-1 bg-orange-500 rounded-full blur-lg opacity-60 pointer-events-none"></div>
-                        <button id="play-pause-btn" class="relative z-10 w-10 h-10 flex items-center justify-center bg-orange-500 rounded-full hover:bg-orange-600 transition-colors flex-shrink-0">
-                            <!-- Play Icon -->
-                            <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
-                            </svg>
-                            <!-- Stop Icon -->
-                            <svg id="stop-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M5 3.5h6A1.5 1.5 0 0 1 12.5 5v6a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 11V5A1.5 1.5 0 0 1 5 3.5z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="text-left">
-                        <p class="font-semibold text-white">Hits Brasil</p>
-                        <p class="text-sm text-gray-400">Hunter.FM</p>
-                    </div>
-                    <audio id="audio-stream" src="https://live.hunter.fm/hitsbrasil_normal" preload="none"></audio>
-                </div>
+             <div class="relative flex justify-center items-center h-32">
+                <span class="absolute text-9xl md:text-[12rem] font-black text-orange-500 opacity-40 blur-3xl pointer-events-none">5</span>
+                <h1 class="relative text-8xl md:text-9xl font-black text-orange-500 drop-shadow-lg z-10">
+                    +5
+                </h1>
             </div>
+            <p class="text-gray-400 -mt-2 uppercase tracking-widest">ATÉ O LIMITE, TODO DIA.</p>
         </header>
 
         <!-- Week/Level Stepper -->
@@ -109,7 +115,7 @@
     </div>
 
     <!-- Fixed Footer Button -->
-    <footer id="footer-container" class="fixed bottom-0 left-0 right-0 p-4 z-50">
+    <footer id="footer-container" class="fixed bottom-0 left-0 right-0 p-4 z-40">
         <div class="container mx-auto max-w-4xl">
             <button id="complete-workout-btn" class="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-green-700 transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl shadow-black/50">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -120,6 +126,50 @@
     
     <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
+    <!-- Floating Music Button -->
+    <button id="open-player-btn" class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white p-4 rounded-full shadow-2xl hover:bg-orange-500 transition-all duration-300 transform hover:scale-110 z-40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-13c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 6l12 3" />
+        </svg>
+    </button>
+    
+    <!-- Music Player Modal -->
+    <div id="player-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-opacity duration-500">
+        <!-- Player Card -->
+        <div id="player-card" class="w-full max-w-sm bg-gray-800/50 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-6 transform scale-95 transition-all duration-500 relative">
+            <!-- Close Button -->
+            <button id="close-player-btn" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+
+            <!-- Album Art -->
+            <img id="album-art" src="imagens/hitsbrasil.jpg" alt="Capa do Álbum" class="w-full rounded-lg shadow-lg aspect-square">
+
+            <!-- Song Info -->
+            <div class="text-center mt-6">
+                <h2 id="song-title" class="text-2xl font-bold">O Canal Hits Brasil</h2>
+                <p id="song-artist" class="text-md text-white/60 mt-1">Hunter.FM</p>
+            </div>
+
+            <!-- Playback Controls -->
+            <div class="flex items-center justify-center gap-6 mt-8">
+                <button id="play-pause-btn" class="bg-orange-500 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+                    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734L10.804 8z"/></svg>
+                    <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 hidden" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
+                </button>
+            </div>
+
+            <!-- Volume Control -->
+            <div class="flex items-center gap-3 mt-8">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/50" fill="currentColor" viewBox="0 0 16 16"><path d="M9 4a.5.5 0 0 0-.812-.39L5.825 5.5H3.5A.5.5 0 0 0 3 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 9 12V4zM6.313 6.313a.5.5 0 0 1 .687 0l.875.875a.5.5 0 0 1 0 .707L7 8.586l.875.875a.5.5 0 0 1 0 .707l-.875.875a.5.5 0 0 1-.687 0l-.875-.875a.5.5 0 0 1 0-.707L6.293 8 5.418 7.125a.5.5 0 0 1 0-.707l.875-.875z"/></svg>
+                <input id="volume-slider" type="range" min="0" max="1" step="0.01" value="0.5" class="w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white/50" fill="currentColor" viewBox="0 0 16 16"><path d="M9 4a.5.5 0 0 0-.812-.39L5.825 5.5H3.5A.5.5 0 0 0 3 6v4a.5.5 0 0 0 .5.5h2.325l2.363 1.89A.5.5 0 0 0 9 12V4zm3.025 4a4.486 4.486 0 0 1-1.318 3.182L10 10.475A3.489 3.489 0 0 0 11.025 8 3.49 3.49 0 0 0 10 5.525l.707-.707A4.486 4.486 0 0 1 12.025 8z"/></svg>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Audio element for playback -->
+    <audio id="audio-player" src="https://live.hunter.fm/hitsbrasil_normal"></audio>
 
     <script>
         const workoutPhases = {
@@ -569,28 +619,72 @@
         dom.completeWorkoutBtn.addEventListener('click', handleCompleteWorkout);
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize workout app
             loadState();
             renderAll();
             
-            // --- Player Logic ---
-            const audio = document.getElementById('audio-stream');
+            // --- MODERN PLAYER LOGIC ---
+            const mainContent = document.getElementById('main-content');
+            const openPlayerBtn = document.getElementById('open-player-btn');
+            const closePlayerBtn = document.getElementById('close-player-btn');
+            const playerModal = document.getElementById('player-modal');
+            const playerCard = document.getElementById('player-card');
+            const audio = document.getElementById('audio-player');
+            
             const playPauseBtn = document.getElementById('play-pause-btn');
             const playIcon = document.getElementById('play-icon');
-            const stopIcon = document.getElementById('stop-icon');
+            const pauseIcon = document.getElementById('pause-icon');
+            const volumeSlider = document.getElementById('volume-slider');
 
-            function togglePlay() {
-                if (audio.paused) {
-                    audio.play().catch(e => console.error("Error playing audio:", e));
-                    playIcon.classList.add('hidden');
-                    stopIcon.classList.remove('hidden');
-                } else {
-                    audio.pause();
-                    playIcon.classList.remove('hidden');
-                    stopIcon.classList.add('hidden');
+            // Modal Logic
+            const openModal = () => {
+                playerModal.classList.remove('invisible', 'opacity-0');
+                playerCard.classList.remove('scale-95');
+                mainContent.classList.add('blur-sm', 'scale-105');
+            };
+
+            const closeModal = () => {
+                playerModal.classList.add('invisible', 'opacity-0');
+                playerCard.classList.add('scale-95');
+                mainContent.classList.remove('blur-sm', 'scale-105');
+            };
+
+            openPlayerBtn.addEventListener('click', openModal);
+            closePlayerBtn.addEventListener('click', closeModal);
+            playerModal.addEventListener('click', (e) => {
+                if (e.target === playerModal) {
+                    closeModal();
                 }
-            }
+            });
 
+            // Player Logic
+            let isPlaying = false;
+
+            const togglePlay = () => {
+                if (isPlaying) {
+                    audio.pause();
+                } else {
+                    audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
+                }
+            };
+            
+            const updatePlayPauseIcon = () => {
+                playIcon.classList.toggle('hidden', isPlaying);
+                pauseIcon.classList.toggle('hidden', !isPlaying);
+            };
+
+            const setVolume = () => {
+                audio.volume = volumeSlider.value;
+            };
+
+            // Event Listeners for Player
             playPauseBtn.addEventListener('click', togglePlay);
+            audio.addEventListener('play', () => { isPlaying = true; updatePlayPauseIcon(); });
+            audio.addEventListener('pause', () => { isPlaying = false; updatePlayPauseIcon(); });
+            volumeSlider.addEventListener('input', setVolume);
+
+            // Set initial volume
+            setVolume();
         });
     </script>
 </body>
