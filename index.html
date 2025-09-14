@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -85,7 +87,7 @@
     <footer id="footer-container" class="fixed bottom-0 left-0 right-0 p-4 z-40">
         <div class="container mx-auto max-w-4xl">
             <button id="complete-workout-btn" class="w-full bg-green-600 text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-green-700 transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl shadow-black/50">
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                 <i class='bx bx-check text-2xl'></i>
                 Concluir Treino
             </button>
         </div>
@@ -94,10 +96,8 @@
     <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
     <!-- Floating Music Button -->
-    <button id="open-player-btn" class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white p-4 rounded-full shadow-2xl hover:bg-orange-500 transition-all duration-300 transform hover:scale-110 z-40">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-13c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 6l12 3" />
-        </svg>
+    <button id="open-player-btn" class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 transition-all duration-300 transform hover:scale-110 z-40 flex items-center justify-center">
+        <i class='bx bx-music text-2xl'></i>
     </button>
     
     <!-- Music Player Modal -->
@@ -106,7 +106,7 @@
         <div id="player-card" class="w-full max-w-sm bg-gray-800/50 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-6 transform scale-95 transition-all duration-500 relative">
             <!-- Close Button -->
             <button id="close-player-btn" class="absolute top-4 right-4 text-white/50 hover:text-white transition-colors z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                <i class='bx bx-x text-2xl'></i>
             </button>
 
             <!-- Album Art -->
@@ -121,8 +121,8 @@
             <!-- Playback Controls -->
             <div class="flex items-center justify-center gap-6 mt-8">
                 <button id="play-pause-btn" class="bg-orange-500 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
-                    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="currentColor" viewBox="0 0 16 16"><path d="M10.804 8 5 4.633v6.734L10.804 8z"/></svg>
-                    <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 hidden" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/></svg>
+                    <i id="play-icon" class='bx bx-play text-3xl'></i>
+                    <i id="pause-icon" class='bx bx-pause text-3xl hidden'></i>
                 </button>
             </div>
         </div>
@@ -296,7 +296,7 @@
                     markerClasses += isLocked ? ' bg-gray-800 border-2 border-gray-600' : ' bg-gray-600';
                 }
                 if(isLocked) {
-                    marker.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 -mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>`;
+                    marker.innerHTML = `<i class='bx bx-lock text-gray-500'></i>`;
                     markerClasses += ' w-6 h-6';
                 }
                 marker.className = markerClasses;
@@ -511,7 +511,7 @@
                         </div>
                         
                          <button class="complete-btn w-full whitespace-nowrap py-3 rounded-lg font-bold text-base transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 ${isCompleted ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20'}">
-                            ${isCompleted ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg> Concluído' : 'Marcar como Concluído'}
+                            ${isCompleted ? '<i class="bx bx-check text-xl"></i> Concluído' : 'Marcar como Concluído'}
                         </button>
                     </div>
                 `;
