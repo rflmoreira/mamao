@@ -650,17 +650,27 @@
             const playerCard = document.getElementById('player-card');
             const audio = document.getElementById('audio-player');
             
-            // Web Audio API para amplificação
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaElementSource(audio);
-            const gainNode = audioContext.createGain();
+            // Web Audio API para amplificação (com fallback para iOS)
+            let audioContext, source, gainNode;
+            let isWebAudioSupported = false;
             
-            // Conecta: audio -> gainNode -> speakers
-            source.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // Define ganho para 160% (1.6x amplificação)
-            gainNode.gain.value = 1.6;
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                source = audioContext.createMediaElementSource(audio);
+                gainNode = audioContext.createGain();
+                
+                // Conecta: audio -> gainNode -> speakers
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Define ganho para 160% (1.6x amplificação)
+                gainNode.gain.value = 1.6;
+                isWebAudioSupported = true;
+                console.log('Web Audio API inicializada com sucesso');
+            } catch (error) {
+                console.log('Web Audio API não suportada, usando volume padrão:', error);
+                isWebAudioSupported = false;
+            }
             
             const playPauseBtn = document.getElementById('play-pause-btn');
             const playIcon = document.getElementById('play-icon');
@@ -694,17 +704,21 @@
                 if (isPlaying) {
                     audio.pause(); // Pausa o stream
                 } else {
-                    // Resume AudioContext se necessário
-                    if (audioContext.state === 'suspended') {
+                    // Resume AudioContext se necessário (apenas se suportado)
+                    if (isWebAudioSupported && audioContext.state === 'suspended') {
                         audioContext.resume().then(() => {
                             console.log('AudioContext resumed');
                         });
                     }
                     
-                    // Força ativação do gainNode
-                    gainNode.gain.value = 1.6;
-                    console.log('Gain set to:', gainNode.gain.value);
-                    console.log('AudioContext state:', audioContext.state);
+                    // Força ativação do gainNode (apenas se suportado)
+                    if (isWebAudioSupported && gainNode) {
+                        gainNode.gain.value = 1.6;
+                        console.log('Gain set to:', gainNode.gain.value);
+                        console.log('AudioContext state:', audioContext.state);
+                    } else {
+                        console.log('Usando volume padrão (iOS fallback)');
+                    }
                     
                     // Força o reload do stream para reconectar
                     audio.load();
@@ -719,8 +733,8 @@
 
             // Event Listeners for Player
             playPauseBtn.addEventListener('click', () => {
-                // Força inicialização do AudioContext na primeira interação
-                if (audioContext.state === 'suspended') {
+                // Força inicialização do AudioContext na primeira interação (apenas se suportado)
+                if (isWebAudioSupported && audioContext.state === 'suspended') {
                     audioContext.resume().then(() => {
                         console.log('AudioContext inicializado com sucesso');
                         togglePlay();
