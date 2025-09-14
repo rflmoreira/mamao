@@ -680,8 +680,10 @@
 
             const togglePlay = () => {
                 if (isPlaying) {
-                    audio.pause(); // Apenas pausa o stream
+                    audio.pause(); // Pausa o stream
                 } else {
+                    // Força o reload do stream para reconectar
+                    audio.load();
                     audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
                 }
             };
