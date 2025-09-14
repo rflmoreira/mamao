@@ -324,7 +324,11 @@
                     markerClasses += isLocked ? ' bg-gray-800 border-2 border-gray-600' : ' bg-gray-600';
                 }
                 if(isLocked) {
-                    marker.innerHTML = `<i class='bx bx-lock text-gray-500 text-xs md:text-sm'></i>`;
+                    if(weekNumber === 12) {
+                        marker.innerHTML = `<i class='bx bx-trophy text-yellow-500 text-xs md:text-sm'></i>`;
+                    } else {
+                        marker.innerHTML = `<i class='bx bx-lock text-gray-500 text-xs md:text-sm'></i>`;
+                    }
                     markerClasses += ' w-3 h-3 md:w-6 md:h-6';
                 }
                 marker.className = markerClasses;
