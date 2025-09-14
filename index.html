@@ -114,7 +114,7 @@
     <!-- Fixed Footer Button -->
     <footer id="footer-container" class="fixed bottom-0 left-0 right-0 p-4 z-40">
         <div class="container mx-auto max-w-4xl">
-            <button id="complete-workout-btn" class="w-full bg-green-600/80 backdrop-blur-sm text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-green-700 transition-all duration-300 disabled:bg-gray-600/80 disabled:backdrop-blur-sm disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl shadow-black/50">
+            <button id="complete-workout-btn" class="w-full bg-orange-600/80 backdrop-blur-sm text-white font-bold py-3 px-6 rounded-lg text-lg hover:bg-orange-500 disabled:bg-gray-600/80 disabled:backdrop-blur-sm disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl shadow-black/50">
                  <i class='ph-thin ph-check text-2xl'></i>
                 Concluir Treino
             </button>
@@ -124,7 +124,7 @@
     <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
     <!-- Floating Music Button -->
-    <button id="open-player-btn" class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 transition-all duration-300 transform hover:scale-110 z-40 flex items-center justify-center">
+    <button id="open-player-btn" class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 z-40 flex items-center justify-center">
         <i class='ph-thin ph-music-notes-simple text-2xl'></i>
     </button>
     
@@ -132,11 +132,6 @@
     <div id="player-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-opacity duration-500">
         <!-- Player Card -->
         <div id="player-card" class="w-full max-w-sm bg-gray-800/50 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-6 transform scale-95 transition-all duration-500 relative">
-            <!-- Close Button -->
-            <button id="close-player-btn" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm rounded-full text-white/70 hover:text-white hover:bg-gray-900/80 transition-all duration-300 z-10">
-                <i class='ph-thin ph-x text-2xl'></i>
-            </button>
-
             <!-- Album Art -->
             <img id="album-art" src="imagens/EDM.png" alt="Capa do Álbum" class="w-full rounded-lg shadow-lg aspect-square">
 
@@ -148,9 +143,16 @@
 
             <!-- Playback Controls -->
             <div class="flex items-center justify-center gap-6 mt-8">
-                <button id="play-pause-btn" class="bg-orange-500 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform">
+                <button id="play-pause-btn" class="bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 flex items-center justify-center">
                     <i id="play-icon" class='ph-thin ph-play text-3xl'></i>
                     <i id="stop-icon" class='ph-thin ph-stop text-3xl hidden'></i>
+                </button>
+            </div>
+
+            <!-- Close Button -->
+            <div class="flex justify-center mt-6">
+                <button id="close-player-btn" class="bg-orange-600/80 backdrop-blur-sm text-white w-12 h-12 rounded-full shadow-2xl hover:bg-orange-500 flex items-center justify-center">
+                    <i class='ph-thin ph-x text-2xl'></i>
                 </button>
             </div>
         </div>
@@ -569,8 +571,8 @@
                             </div>
                         </div>
                         
-                         <button class="complete-btn w-full whitespace-nowrap py-3 rounded-lg font-bold text-base transition-all duration-300 transform hover:scale-105 flex items-center justify-center gap-2 ${isCompleted ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20'}">
-                            ${isCompleted ? '<i class="ph-thin ph-check text-xl"></i> Concluído' : 'Marcar como Concluído'}
+                         <button class="complete-btn w-full whitespace-nowrap py-3 rounded-lg font-bold text-base flex items-center justify-center gap-2 min-h-[3rem] ${isCompleted ? 'bg-green-600/80 backdrop-blur-sm text-white shadow-2xl' : 'bg-orange-600/80 backdrop-blur-sm hover:bg-orange-500 text-white shadow-2xl'}">
+                            ${isCompleted ? '<i class="ph-thin ph-check text-xl"></i> Concluído' : '<i class="ph-thin ph-circle text-xl opacity-0"></i> Marcar como Concluído'}
                         </button>
                     </div>
                 `;
