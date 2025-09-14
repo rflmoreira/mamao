@@ -650,28 +650,6 @@
             const playerCard = document.getElementById('player-card');
             const audio = document.getElementById('audio-player');
             
-            // Web Audio API para amplificação (com fallback para iOS)
-            let audioContext, source, gainNode;
-            let isWebAudioSupported = false;
-            
-            try {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                source = audioContext.createMediaElementSource(audio);
-                gainNode = audioContext.createGain();
-                
-                // Conecta: audio -> gainNode -> speakers
-                source.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                // Define ganho para 160% (1.6x amplificação)
-                gainNode.gain.value = 1.6;
-                isWebAudioSupported = true;
-                console.log('Web Audio API inicializada com sucesso');
-            } catch (error) {
-                console.log('Web Audio API não suportada, usando volume padrão:', error);
-                isWebAudioSupported = false;
-            }
-            
             const playPauseBtn = document.getElementById('play-pause-btn');
             const playIcon = document.getElementById('play-icon');
             const stopIcon = document.getElementById('stop-icon');
@@ -704,22 +682,6 @@
                 if (isPlaying) {
                     audio.pause(); // Pausa o stream
                 } else {
-                    // Resume AudioContext se necessário (apenas se suportado)
-                    if (isWebAudioSupported && audioContext.state === 'suspended') {
-                        audioContext.resume().then(() => {
-                            console.log('AudioContext resumed');
-                        });
-                    }
-                    
-                    // Força ativação do gainNode (apenas se suportado)
-                    if (isWebAudioSupported && gainNode) {
-                        gainNode.gain.value = 1.6;
-                        console.log('Gain set to:', gainNode.gain.value);
-                        console.log('AudioContext state:', audioContext.state);
-                    } else {
-                        console.log('Usando volume padrão (iOS fallback)');
-                    }
-                    
                     // Força o reload do stream para reconectar
                     audio.load();
                     audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
@@ -732,17 +694,7 @@
             };
 
             // Event Listeners for Player
-            playPauseBtn.addEventListener('click', () => {
-                // Força inicialização do AudioContext na primeira interação (apenas se suportado)
-                if (isWebAudioSupported && audioContext.state === 'suspended') {
-                    audioContext.resume().then(() => {
-                        console.log('AudioContext inicializado com sucesso');
-                        togglePlay();
-                    });
-                } else {
-                    togglePlay();
-                }
-            });
+            playPauseBtn.addEventListener('click', togglePlay);
             audio.addEventListener('play', () => { isPlaying = true; updatePlayPauseIcon(); });
             audio.addEventListener('pause', () => { isPlaying = false; updatePlayPauseIcon(); });
 
