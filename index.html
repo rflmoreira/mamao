@@ -696,8 +696,16 @@
                 } else {
                     // Resume AudioContext se necessário
                     if (audioContext.state === 'suspended') {
-                        audioContext.resume();
+                        audioContext.resume().then(() => {
+                            console.log('AudioContext resumed');
+                        });
                     }
+                    
+                    // Força ativação do gainNode
+                    gainNode.gain.value = 1.6;
+                    console.log('Gain set to:', gainNode.gain.value);
+                    console.log('AudioContext state:', audioContext.state);
+                    
                     // Força o reload do stream para reconectar
                     audio.load();
                     audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
@@ -710,7 +718,17 @@
             };
 
             // Event Listeners for Player
-            playPauseBtn.addEventListener('click', togglePlay);
+            playPauseBtn.addEventListener('click', () => {
+                // Força inicialização do AudioContext na primeira interação
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume().then(() => {
+                        console.log('AudioContext inicializado com sucesso');
+                        togglePlay();
+                    });
+                } else {
+                    togglePlay();
+                }
+            });
             audio.addEventListener('play', () => { isPlaying = true; updatePlayPauseIcon(); });
             audio.addEventListener('pause', () => { isPlaying = false; updatePlayPauseIcon(); });
 
