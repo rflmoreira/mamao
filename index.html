@@ -650,6 +650,18 @@
             const playerCard = document.getElementById('player-card');
             const audio = document.getElementById('audio-player');
             
+            // Web Audio API para amplificação
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const source = audioContext.createMediaElementSource(audio);
+            const gainNode = audioContext.createGain();
+            
+            // Conecta: audio -> gainNode -> speakers
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Define ganho para 130% (1.3x amplificação)
+            gainNode.gain.value = 1.3;
+            
             const playPauseBtn = document.getElementById('play-pause-btn');
             const playIcon = document.getElementById('play-icon');
             const stopIcon = document.getElementById('stop-icon');
@@ -682,6 +694,10 @@
                 if (isPlaying) {
                     audio.pause(); // Pausa o stream
                 } else {
+                    // Resume AudioContext se necessário
+                    if (audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
                     // Força o reload do stream para reconectar
                     audio.load();
                     audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
