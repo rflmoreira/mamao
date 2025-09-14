@@ -698,8 +698,8 @@
             audio.addEventListener('play', () => { isPlaying = true; updatePlayPauseIcon(); });
             audio.addEventListener('pause', () => { isPlaying = false; updatePlayPauseIcon(); });
 
-            // Set initial volume to 180%
-            audio.volume = 1.8;
+            // Set initial volume to 100% (máximo permitido pelo navegador)
+            audio.volume = 1.0;
         });
     </script>
 </body>
