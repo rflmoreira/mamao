@@ -642,16 +642,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="p-4 bg-gray-900/50 rounded-b-xl mt-auto">
-                        <div class="completion-toggle-wrapper flex items-center justify-center w-full cursor-pointer rounded-lg p-2 transition-colors duration-300 hover:bg-gray-700/50" data-index="${index}">
-                            <div class="animated-check-container ${isCompleted ? 'completed' : ''}">
-                                <svg class="animated-check-svg" viewBox="0 0 24 24">
-                                    <circle class="animated-check-circle" cx="12" cy="12" r="10"/>
-                                    <path class="animated-check-path" d="M7 13l3 3 7-7"/>
-                                </svg>
-                            </div>
-                            <span class="ml-3 font-bold text-lg transition-colors duration-300 ${isCompleted ? 'text-green-400' : 'text-gray-300'}">${isCompleted ? 'Concluído!' : 'Marcar como Concluído'}</span>
+                    <div class="completion-toggle-wrapper p-4 bg-gray-900/50 rounded-b-xl mt-auto flex items-center justify-center cursor-pointer transition-colors duration-300 hover:bg-gray-700/50" data-index="${index}">
+                        <div class="animated-check-container ${isCompleted ? 'completed' : ''}">
+                            <svg class="animated-check-svg" viewBox="0 0 24 24">
+                                <circle class="animated-check-circle" cx="12" cy="12" r="10"/>
+                                <path class="animated-check-path" d="M7 13l3 3 7-7"/>
+                            </svg>
                         </div>
+                        <span class="ml-3 font-bold text-lg transition-colors duration-300 ${isCompleted ? 'text-green-400' : 'text-gray-300'}">${isCompleted ? 'Concluído!' : 'Marcar como Concluído'}</span>
                     </div>
                 `;
 
