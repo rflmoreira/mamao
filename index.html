@@ -144,7 +144,7 @@
         .header-background {
             background-image: url('imagens/ambitious-studio-rick-barrett-lTTjG469mHk-unsplash.jpg');
             background-size: cover;
-            background-position: center;
+            background-position: center 35%;
             background-repeat: no-repeat;
             background-attachment: fixed;
             position: relative;
@@ -159,11 +159,9 @@
             overflow: hidden;
         }
         
-        /* Fallback para dispositivos móveis que não suportam background-attachment: fixed */
+        /* O efeito Parallax (background-attachment: fixed) agora está ativo também em mobile */
         @media (max-width: 768px) {
-            .header-background {
-                background-attachment: scroll;
-            }
+            /* A regra que desativava o parallax foi removida. */
             
             /* Ajuste do degradê para mobile - elevando para melhor integração visual */
             .header-background::before {
