@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-g">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>+5</title>
+    <title>HypeFit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -242,7 +242,8 @@
             currentDay: 'Seg',
             highestUnlockedWeek: 1,
             highestUnlockedDayIndex: 0, 
-            completionStatus: {}
+            completionStatus: {},
+            allCompletions: {}
         };
 
         const dom = {
@@ -307,6 +308,7 @@
             appState.highestUnlockedWeek = 1;
             appState.highestUnlockedDayIndex = 0;
             appState.completionStatus = {};
+            appState.allCompletions = {};
             console.warn("Estado foi resetado devido a dados salvos inválidos.");
         }
 
@@ -315,6 +317,7 @@
             localStorage.setItem('workoutProgress', JSON.stringify({
                 highestUnlockedWeek: appState.highestUnlockedWeek,
                 highestUnlockedDayIndex: appState.highestUnlockedDayIndex,
+                allCompletions: appState.allCompletions
             }));
         }
 
@@ -351,6 +354,8 @@
                 appState.currentWeekNumber = week;
                 appState.highestUnlockedDayIndex = dayIndex;
                 appState.currentDay = dayKeys[dayIndex];
+                appState.allCompletions = savedState.allCompletions || {};
+                loadCurrentCompletionStatus();
 
             } catch (error) {
                 console.error("Falha ao carregar ou validar estado do localStorage. Resetando.", error);
@@ -366,6 +371,11 @@
                 }
             }
             return null;
+        }
+
+        function loadCurrentCompletionStatus() {
+            const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
+            appState.completionStatus = appState.allCompletions[key] || {};
         }
 
         // --- Funções de Renderização ---
@@ -400,7 +410,7 @@
                         const newPhaseData = getPhaseDataByWeek(weekNumber);
                         const dayKeys = Object.keys(newPhaseData.schedule);
                         appState.currentDay = weekNumber === appState.highestUnlockedWeek ? dayKeys[appState.highestUnlockedDayIndex] : dayKeys[0];
-                        appState.completionStatus = {};
+                        loadCurrentCompletionStatus();
                         renderAll();
                     });
                 }
@@ -478,7 +488,7 @@
                 if (!isLocked && workoutLetter !== 'OFF') {
                     button.addEventListener('click', () => {
                         appState.currentDay = day;
-                        appState.completionStatus = {};
+                        loadCurrentCompletionStatus();
                         renderWorkout();
                         renderDaySelector();
                     });
@@ -510,7 +520,10 @@
             const completedExercises = Object.values(appState.completionStatus).filter(Boolean).length;
             const progress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
             
-            dom.completeWorkoutBtn.disabled = completedExercises < totalExercises;
+            const isCurrentProgressDay = appState.currentWeekNumber === appState.highestUnlockedWeek &&
+                               Object.keys(phaseData.schedule).indexOf(appState.currentDay) === appState.highestUnlockedDayIndex;
+
+            dom.completeWorkoutBtn.disabled = (completedExercises < totalExercises) || !isCurrentProgressDay;
 
             dom.progressBarContainer.innerHTML = `
                 <div class="flex justify-between items-center mb-1 text-sm font-semibold">
@@ -655,6 +668,9 @@
 
                 card.querySelector('.completion-toggle-wrapper').addEventListener('click', () => {
                     appState.completionStatus[index] = !appState.completionStatus[index];
+                    const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
+                    appState.allCompletions[key] = appState.completionStatus;
+                    saveState();
                     renderWorkout();
                 });
                 
@@ -670,6 +686,9 @@
                 origin: { y: 0.6 },
                 colors: ['#f97316', '#fb923c', '#fed7aa', '#ffffff']
             });
+            
+            const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
+            appState.allCompletions[key] = appState.completionStatus;
 
             const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
             const dayKeys = Object.keys(phaseData.schedule);
@@ -690,14 +709,16 @@
                     const nextPhaseData = getPhaseDataByWeek(appState.currentWeekNumber);
                     appState.currentDay = Object.keys(nextPhaseData.schedule)[0];
                 } else {
+                    saveState();
                     showCompletionMessage();
+                    return;
                 }
             } else {
                  appState.highestUnlockedDayIndex = nextDayIndex;
                  appState.currentDay = dayKeys[nextDayIndex];
             }
-
-            appState.completionStatus = {};
+            
+            loadCurrentCompletionStatus();
             saveState();
             
             setTimeout(() => {
@@ -896,3 +917,4 @@
     </script>
 </body>
 </html>
+
