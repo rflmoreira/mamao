@@ -155,7 +155,7 @@
     <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
 
     <!-- Botão Flutuante de Música -->
-    <button id="open-player-btn" class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 z-40 flex items-center justify-center">
+    <button id="open-player-btn" class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 z-40 flex items-center justify-center cursor-grab active:cursor-grabbing">
         <i class='ph-fill ph-music-notes-simple text-2xl'></i>
     </button>
     
@@ -702,13 +702,127 @@
                 mainContent.classList.remove('blur-sm', 'scale-105');
             };
 
-            openPlayerBtn.addEventListener('click', openModal);
             closePlayerBtn.addEventListener('click', closeModal);
             playerModal.addEventListener('click', (e) => {
                 if (e.target === playerModal) {
                     closeModal();
                 }
             });
+
+            // --- LÓGICA DE ARRASTAR E SOLTAR O BOTÃO DE MÚSICA ---
+            let isDragging = false;
+            let hasDragged = false;
+            let startX, startY;
+            let initialLeft, initialTop;
+
+            function dragStart(e) {
+                if (e.type === 'touchstart') {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                } else {
+                    // Previne o comportamento padrão do mouse (ex: arrastar imagem)
+                    e.preventDefault();
+                    startX = e.clientX;
+                    startY = e.clientY;
+                }
+                
+                const rect = openPlayerBtn.getBoundingClientRect();
+                initialLeft = rect.left;
+                initialTop = rect.top;
+                
+                isDragging = true;
+                hasDragged = false;
+                
+                openPlayerBtn.style.transition = 'none';
+
+                window.addEventListener('mousemove', dragging);
+                window.addEventListener('mouseup', dragEnd);
+                window.addEventListener('touchmove', dragging, { passive: false });
+                window.addEventListener('touchend', dragEnd);
+            }
+
+            function dragging(e) {
+                if (!isDragging) return;
+                
+                // Previne o scroll da página no mobile
+                if (e.type === 'touchmove') {
+                    e.preventDefault();
+                }
+
+                let currentX, currentY;
+                if (e.type === 'touchmove') {
+                    currentX = e.touches[0].clientX;
+                    currentY = e.touches[0].clientY;
+                } else {
+                    currentX = e.clientX;
+                    currentY = e.clientY;
+                }
+                
+                const dx = currentX - startX;
+                const dy = currentY - startY;
+
+                if (!hasDragged && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+                    hasDragged = true;
+                    if (openPlayerBtn.classList.contains('top-1/2')) {
+                        openPlayerBtn.classList.remove('top-1/2', 'right-0', '-translate-y-1/2', 'mr-4', 'md:mr-6');
+                        openPlayerBtn.style.top = `${initialTop}px`;
+                        openPlayerBtn.style.left = `${initialLeft}px`;
+                    }
+                }
+                
+                if (hasDragged) {
+                    openPlayerBtn.style.top = `${initialTop + dy}px`;
+                    openPlayerBtn.style.left = `${initialLeft + dx}px`;
+                }
+            }
+
+            function dragEnd() {
+                if (!isDragging) return;
+                isDragging = false;
+                
+                window.removeEventListener('mousemove', dragging);
+                window.removeEventListener('mouseup', dragEnd);
+                window.removeEventListener('touchmove', dragging);
+                window.removeEventListener('touchend', dragEnd);
+                
+                if (!hasDragged) {
+                    openModal();
+                    return;
+                }
+                
+                openPlayerBtn.style.transition = 'top 0.3s ease-out, left 0.3s ease-out';
+
+                const btnRect = openPlayerBtn.getBoundingClientRect();
+                const winWidth = window.innerWidth;
+                const winHeight = window.innerHeight;
+                const margin = 24;
+
+                const centerX = btnRect.left + btnRect.width / 2;
+                
+                // Determine horizontal snap position (left or right)
+                const finalLeft = (centerX < winWidth / 2) 
+                    ? margin 
+                    : winWidth - btnRect.width - margin;
+
+                // Define the vertical snap points based on the final *top* position of the button
+                const snapPointsY = [
+                    margin, // Top
+                    (winHeight / 2) - (btnRect.height / 2), // Middle
+                    winHeight - btnRect.height - margin // Bottom
+                ];
+
+                // Find the closest vertical snap point to the button's current top position
+                let finalTop = snapPointsY.reduce((closest, current) => {
+                    return (Math.abs(current - btnRect.top) < Math.abs(closest - btnRect.top) ? current : closest);
+                });
+                
+                openPlayerBtn.style.top = `${finalTop}px`;
+                openPlayerBtn.style.left = `${finalLeft}px`;
+                openPlayerBtn.style.transform = 'none';
+            }
+
+            openPlayerBtn.addEventListener('mousedown', dragStart);
+            openPlayerBtn.addEventListener('touchstart', dragStart);
 
             // Lógica do Player
             let isPlaying = false;
@@ -739,4 +853,3 @@
     </script>
 </body>
 </html>
-
