@@ -184,7 +184,7 @@
     <!-- Botão Fixo do Rodapé -->
     <footer id="footer-container" class="fixed bottom-0 left-0 right-0 p-4 z-40">
         <div class="container mx-auto max-w-4xl">
-            <button id="complete-workout-btn" class="w-full bg-green-600/80 backdrop-blur-sm text-white font-bold py-3 px-6 rounded-3xl text-lg hover:bg-green-500 disabled:bg-gray-600/80 disabled:backdrop-blur-sm disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl shadow-black/50">
+            <button id="complete-workout-btn" class="w-full bg-gray-600/80 backdrop-blur-sm text-white font-bold py-3 px-6 rounded-3xl text-lg hover:bg-gray-500 disabled:bg-gray-600/80 disabled:backdrop-blur-sm disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl shadow-black/50">
                  <i class='ph-bold ph-checks text-2xl'></i>
                 Concluir Treino
             </button>
@@ -523,7 +523,17 @@
             const isCurrentProgressDay = appState.currentWeekNumber === appState.highestUnlockedWeek &&
                                Object.keys(phaseData.schedule).indexOf(appState.currentDay) === appState.highestUnlockedDayIndex;
 
-            dom.completeWorkoutBtn.disabled = (completedExercises < totalExercises) || !isCurrentProgressDay;
+            // MODIFICADO: Botão só é desabilitado se não for o dia de progresso atual.
+            dom.completeWorkoutBtn.disabled = !isCurrentProgressDay;
+
+            // MODIFICADO: Altera a cor do botão com base na conclusão
+            if (completedExercises >= totalExercises) {
+                dom.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
+                dom.completeWorkoutBtn.classList.add('bg-green-600/80', 'hover:bg-green-500');
+            } else {
+                dom.completeWorkoutBtn.classList.remove('bg-green-600/80', 'hover:bg-green-500');
+                dom.completeWorkoutBtn.classList.add('bg-gray-600/80', 'hover:bg-gray-500');
+            }
 
             dom.progressBarContainer.innerHTML = `
                 <div class="flex justify-between items-center mb-1 text-sm font-semibold">
@@ -680,6 +690,16 @@
         
         // --- Manipuladores de Eventos e Inicialização ---
         function handleCompleteWorkout() {
+             // MODIFICADO: Marca todos os exercícios como concluídos ao clicar no botão
+            const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
+            const workoutLetter = phaseData.schedule[appState.currentDay];
+            const workout = phaseData.workouts[workoutLetter];
+            if (workout) {
+                workout.exercises.forEach((_, index) => {
+                    appState.completionStatus[index] = true;
+                });
+            }
+
             myConfetti({
                 particleCount: 150,
                 spread: 90,
@@ -690,16 +710,16 @@
             const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
             appState.allCompletions[key] = appState.completionStatus;
 
-            const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
-            const dayKeys = Object.keys(phaseData.schedule);
+            const currentPhaseData = getPhaseDataByWeek(appState.currentWeekNumber);
+            const dayKeys = Object.keys(currentPhaseData.schedule);
             const currentDayIndex = dayKeys.indexOf(appState.currentDay);
 
             let nextDayIndex = currentDayIndex + 1;
-            while(nextDayIndex < dayKeys.length && phaseData.schedule[dayKeys[nextDayIndex]] === 'OFF') {
+            while(nextDayIndex < dayKeys.length && currentPhaseData.schedule[dayKeys[nextDayIndex]] === 'OFF') {
                 nextDayIndex++;
             }
             
-            let isLastTrainingDay = !dayKeys.slice(currentDayIndex + 1).some(day => phaseData.schedule[day] !== 'OFF');
+            let isLastTrainingDay = !dayKeys.slice(currentDayIndex + 1).some(day => currentPhaseData.schedule[day] !== 'OFF');
 
             if (isLastTrainingDay) {
                 if (appState.highestUnlockedWeek < 12) {
@@ -917,4 +937,3 @@
     </script>
 </body>
 </html>
-
