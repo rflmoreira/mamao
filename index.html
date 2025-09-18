@@ -138,6 +138,18 @@
                 min-width: calc((100% - 6 * 0.125rem) / 7);
                 max-width: calc((100% - 6 * 0.125rem) / 7);
             }
+            
+            /* Ajuste do degradê do cabeçalho para mobile */
+            .header-background::before {
+                background: linear-gradient(
+                    to bottom,
+                    rgba(17, 24, 39, 0.6) 0%,
+                    rgba(17, 24, 39, 0.7) 60%,
+                    rgba(17, 24, 39, 0.85) 75%,
+                    rgba(17, 24, 39, 0.95) 90%,
+                    rgba(17, 24, 39, 1) 100%
+                );
+            }
         }
 
         /* Background da parte superior da página */
