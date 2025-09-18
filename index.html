@@ -217,7 +217,7 @@
         </div>
 
         <!-- Seletor de Dia/Treino -->
-        <div id="day-selector" class="flex justify-center gap-1 md:gap-2 mb-8 bg-gray-800 p-2 rounded-lg overflow-hidden">
+        <div id="day-selector" class="flex justify-center items-center gap-1 md:gap-2 mb-8 bg-gray-800 p-2 rounded-lg overflow-hidden">
              <!-- Abas dos dias serão inseridas aqui pelo JS -->
         </div>
         
@@ -276,6 +276,20 @@
         </div>
     </div>
     
+    <!-- Modal de Edição de Treinos -->
+    <div id="edit-schedule-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all duration-300">
+        <div id="edit-schedule-card" class="w-full max-w-md bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl p-6 transform scale-95 transition-all duration-300">
+            <h2 class="text-2xl font-bold text-center text-orange-400 mb-6">Editar treinos da semana</h2>
+            <div id="edit-schedule-list" class="space-y-4">
+                <!-- Conteúdo do modal será gerado pelo JS -->
+            </div>
+            <div class="flex justify-end gap-4 mt-8">
+                <button id="cancel-edit-btn" class="px-6 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg font-semibold transition-colors">Cancelar</button>
+                <button id="save-edit-btn" class="px-6 py-2 bg-orange-600 hover:bg-orange-500 rounded-lg font-bold text-white transition-colors">Salvar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Elemento de áudio para reprodução -->
     <audio id="audio-player" src="https://stream.sunshine-live.de/edm/mp3-128/"></audio>
 
@@ -304,7 +318,12 @@
             progressBarContainer: document.getElementById('progress-bar-container'),
             phaseHeader: document.getElementById('phase-header'),
             footer: document.getElementById('footer-container'),
-            completeWorkoutBtn: document.getElementById('complete-workout-btn')
+            completeWorkoutBtn: document.getElementById('complete-workout-btn'),
+            editScheduleModal: document.getElementById('edit-schedule-modal'),
+            editScheduleCard: document.getElementById('edit-schedule-card'),
+            editScheduleList: document.getElementById('edit-schedule-list'),
+            cancelEditBtn: document.getElementById('cancel-edit-btn'),
+            saveEditBtn: document.getElementById('save-edit-btn'),
         };
         
         const confettiCanvas = document.getElementById('confetti-canvas');
@@ -353,6 +372,7 @@
         
         function resetState() {
             localStorage.removeItem('workoutProgress');
+            localStorage.removeItem('customSchedules'); // Limpa também os agendamentos customizados
             appState.currentWeekNumber = 1;
             appState.currentDay = 'Seg';
             appState.highestUnlockedWeek = 1;
@@ -360,6 +380,8 @@
             appState.completionStatus = {};
             appState.allCompletions = {};
             console.warn("Estado foi resetado devido a dados salvos inválidos.");
+            // Recarrega os dados originais se a função for chamada
+            Object.assign(workoutPhases, JSON.parse(JSON.stringify(originalWorkoutPhases)));
         }
 
         // --- Gerenciamento de Estado ---
@@ -369,9 +391,32 @@
                 highestUnlockedDayIndex: appState.highestUnlockedDayIndex,
                 allCompletions: appState.allCompletions
             }));
+            
+            // Salva apenas os agendamentos modificados
+            const customSchedules = {};
+            for (const phaseKey in workoutPhases) {
+                customSchedules[phaseKey] = workoutPhases[phaseKey].schedule;
+            }
+            localStorage.setItem('customSchedules', JSON.stringify(customSchedules));
         }
 
         function loadState() {
+            // Carrega agendamentos customizados
+            const savedSchedulesJSON = localStorage.getItem('customSchedules');
+            if (savedSchedulesJSON) {
+                try {
+                    const savedSchedules = JSON.parse(savedSchedulesJSON);
+                    for (const phaseKey in savedSchedules) {
+                        if (workoutPhases[phaseKey]) {
+                            workoutPhases[phaseKey].schedule = savedSchedules[phaseKey];
+                        }
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar agendamentos customizados. Usando padrão.", e);
+                }
+            }
+
+            // Carrega progresso
             try {
                 const savedStateJSON = localStorage.getItem('workoutProgress');
                 if (!savedStateJSON) return;
@@ -418,6 +463,15 @@
                 const phase = workoutPhases[phaseKey];
                 if (phase.weeks.includes(weekNumber)) {
                     return phase;
+                }
+            }
+            return null;
+        }
+        
+        function getPhaseKeyByWeek(weekNumber) {
+            for (const phaseKey in workoutPhases) {
+                if (workoutPhases[phaseKey].weeks.includes(weekNumber)) {
+                    return phaseKey;
                 }
             }
             return null;
@@ -545,6 +599,15 @@
                 }
                 dom.daySelector.appendChild(button);
             });
+
+            // Adiciona o botão de editar
+            const editButton = document.createElement('button');
+            editButton.id = 'edit-schedule-btn';
+            editButton.className = `flex-shrink-0 flex items-center justify-center px-2 py-1.5 rounded-md bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-orange-400 transition-colors duration-200`;
+            editButton.innerHTML = `<i class="ph-bold ph-pencil-simple text-lg"></i>`;
+            editButton.title = 'Editar treinos da semana';
+            editButton.addEventListener('click', openEditModal);
+            dom.daySelector.appendChild(editButton);
         }
 
         function renderWorkout() {
@@ -573,10 +636,8 @@
             const isCurrentProgressDay = appState.currentWeekNumber === appState.highestUnlockedWeek &&
                                Object.keys(phaseData.schedule).indexOf(appState.currentDay) === appState.highestUnlockedDayIndex;
 
-            // MODIFICADO: Botão só é desabilitado se não for o dia de progresso atual.
             dom.completeWorkoutBtn.disabled = !isCurrentProgressDay;
 
-            // MODIFICADO: Altera a cor do botão com base na conclusão
             if (completedExercises >= totalExercises) {
                 dom.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
                 dom.completeWorkoutBtn.classList.add('bg-green-600/80', 'hover:bg-green-500');
@@ -804,6 +865,100 @@
             renderWorkout();
         }
         
+        // --- Lógica do Modal de Edição ---
+        function openEditModal() {
+            const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
+            if (!phaseData) return;
+
+            const schedule = phaseData.schedule;
+            const workouts = phaseData.workouts;
+            const workoutOptions = Object.keys(workouts);
+            const dayNames = { "Seg": "Segunda", "Ter": "Terça", "Qua": "Quarta", "Qui": "Quinta", "Sex": "Sexta", "Sáb": "Sábado", "Dom": "Domingo" };
+
+            dom.editScheduleList.innerHTML = ''; // Limpa a lista
+
+            Object.keys(schedule).forEach(dayKey => {
+                const currentWorkout = schedule[dayKey];
+                const row = document.createElement('div');
+                row.className = 'flex items-center justify-between bg-gray-700/50 p-3 rounded-lg';
+
+                const label = document.createElement('label');
+                label.textContent = dayNames[dayKey];
+                label.className = 'font-semibold text-white';
+
+                const select = document.createElement('select');
+                select.id = `edit-day-${dayKey}`;
+                select.className = 'bg-gray-900 border border-gray-600 text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-1/2 p-2.5';
+                
+                // Adiciona opção de descanso
+                const offOption = document.createElement('option');
+                offOption.value = 'OFF';
+                offOption.textContent = 'Dia de Descanso';
+                select.appendChild(offOption);
+                
+                // Adiciona opções de treino
+                workoutOptions.forEach(workoutKey => {
+                    const option = document.createElement('option');
+                    option.value = workoutKey;
+                    option.textContent = workouts[workoutKey].name;
+                    select.appendChild(option);
+                });
+                
+                select.value = currentWorkout;
+                row.appendChild(label);
+                row.appendChild(select);
+                dom.editScheduleList.appendChild(row);
+            });
+
+            dom.editScheduleModal.classList.remove('invisible', 'opacity-0');
+            dom.editScheduleCard.classList.remove('scale-95');
+        }
+
+        function closeEditModal() {
+            dom.editScheduleModal.classList.add('invisible', 'opacity-0');
+            dom.editScheduleCard.classList.add('scale-95');
+        }
+
+        function saveScheduleChanges() {
+            const phaseKey = getPhaseKeyByWeek(appState.currentWeekNumber);
+            if (!phaseKey) return;
+
+            const newSchedule = {};
+            const dayKeys = Object.keys(workoutPhases[phaseKey].schedule);
+            let firstActiveDay = null;
+            
+            dayKeys.forEach(dayKey => {
+                const select = document.getElementById(`edit-day-${dayKey}`);
+                const newWorkout = select.value;
+                newSchedule[dayKey] = newWorkout;
+                
+                // Define o primeiro dia ativo para o qual o app deve navegar
+                if (newWorkout !== 'OFF' && !firstActiveDay) {
+                    firstActiveDay = dayKey;
+                }
+            });
+            
+            workoutPhases[phaseKey].schedule = newSchedule;
+            
+            // Verifica se o dia atual ainda é um dia de treino. Se não for, muda para o primeiro dia de treino disponível.
+            const currentWorkoutLetter = newSchedule[appState.currentDay];
+            if (currentWorkoutLetter === 'OFF' || !workoutPhases[phaseKey].workouts[currentWorkoutLetter]) {
+                appState.currentDay = firstActiveDay || dayKeys[0]; // Se não houver dia ativo, vai para o primeiro dia da semana
+            }
+            
+            saveState(); // Salva o novo agendamento no localStorage
+            renderAll();
+            closeEditModal();
+        }
+
+        dom.cancelEditBtn.addEventListener('click', closeEditModal);
+        dom.saveEditBtn.addEventListener('click', saveScheduleChanges);
+        dom.editScheduleModal.addEventListener('click', (e) => {
+            if (e.target === dom.editScheduleModal) {
+                closeEditModal();
+            }
+        });
+        
         dom.completeWorkoutBtn.addEventListener('click', handleCompleteWorkout);
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -987,3 +1142,4 @@
     </script>
 </body>
 </html>
+
