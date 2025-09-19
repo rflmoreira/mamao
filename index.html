@@ -519,7 +519,7 @@
             
             for (let i = 1; i <= 12; i++) {
                 const weekNumber = i;
-                const isLocked = weekNumber > appState.highestUnlockedWeek;
+                const isLocked = false; // weekNumber > appState.highestUnlockedWeek;
                 
                 const markerWrapper = document.createElement('div');
                 markerWrapper.className = `group relative flex flex-col items-center p-0.5 md:p-2 ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`;
@@ -588,7 +588,7 @@
             dom.daySelector.innerHTML = '';
 
             dayKeys.forEach((day, index) => {
-                const isLocked = appState.currentWeekNumber === appState.highestUnlockedWeek && index > appState.highestUnlockedDayIndex;
+                const isLocked = false; // appState.currentWeekNumber === appState.highestUnlockedWeek && index > appState.highestUnlockedDayIndex;
                 const workoutLetter = phaseData.schedule[day];
                 const button = document.createElement('button');
                 button.textContent = day;
@@ -619,8 +619,8 @@
             // Adiciona o botão de editar
             const editButton = document.createElement('button');
             editButton.id = 'edit-schedule-btn';
-            editButton.className = `flex-shrink-0 flex items-center justify-center px-2 py-1.5 rounded-md bg-gray-700 text-gray-400 hover:bg-gray-600 hover:text-orange-400 transition-colors duration-200`;
-            editButton.innerHTML = `<i class="ph-bold ph-pencil-simple text-lg"></i>`;
+            editButton.className = `flex-shrink-0 flex items-center justify-center p-1 rounded-md text-gray-400 hover:bg-gray-600 hover:text-orange-400 transition-colors duration-200`;
+            editButton.innerHTML = `<i class="ph-bold ph-pencil-simple text-base"></i>`;
             editButton.title = 'Editar treinos da semana';
             editButton.addEventListener('click', openEditModal);
             dom.daySelector.appendChild(editButton);
@@ -649,10 +649,7 @@
             const completedExercises = Object.values(appState.completionStatus).filter(Boolean).length;
             const progress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
             
-            const isCurrentProgressDay = appState.currentWeekNumber === appState.highestUnlockedWeek &&
-                               Object.keys(phaseData.schedule).indexOf(appState.currentDay) === appState.highestUnlockedDayIndex;
-
-            dom.completeWorkoutBtn.disabled = !isCurrentProgressDay;
+            dom.completeWorkoutBtn.disabled = false;
 
             if (completedExercises >= totalExercises) {
                 dom.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
@@ -896,15 +893,15 @@
             Object.keys(schedule).forEach(dayKey => {
                 const currentWorkout = schedule[dayKey];
                 const row = document.createElement('div');
-                row.className = 'flex items-center justify-between bg-gray-900/50 px-2 py-1.5 rounded-lg';
+                row.className = 'grid grid-cols-5 items-center gap-2 bg-gray-900/50 px-2 py-1.5 rounded-lg';
 
                 const label = document.createElement('label');
                 label.textContent = dayNames[dayKey];
-                label.className = 'font-semibold text-white text-sm';
+                label.className = 'font-semibold text-white text-sm col-span-2';
 
                 const select = document.createElement('select');
                 select.id = `edit-day-${dayKey}`;
-                select.className = 'bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-3/5 py-1 px-2';
+                select.className = 'bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full col-span-3 py-1 px-2';
                 
                 // Adiciona opção de descanso
                 const offOption = document.createElement('option');
