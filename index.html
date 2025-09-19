@@ -152,6 +152,24 @@
             }
         }
 
+        /* Ajuste para telas pequenas como iPhone SE */
+        @media (max-height: 680px) {
+            #edit-schedule-modal {
+                align-items: flex-start; /* Alinha no topo */
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            #edit-schedule-card {
+                max-height: calc(100vh - 2rem); /* Altura máxima - padding */
+                display: flex;
+                flex-direction: column;
+            }
+            #edit-schedule-list {
+                overflow-y: auto; /* Habilita scroll na lista */
+                flex-shrink: 1;
+            }
+        }
+
         /* Background da parte superior da página */
         .header-background {
             background-image: url('imagens/ambitious-studio-rick-barrett-lTTjG469mHk-unsplash.jpg');
@@ -278,12 +296,12 @@
     
     <!-- Modal de Edição de Treinos -->
     <div id="edit-schedule-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all duration-300">
-        <div id="edit-schedule-card" class="w-full max-w-sm bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl p-5 transform scale-95 transition-all duration-300">
-            <h2 class="text-xl font-bold text-center text-orange-400 mb-4">Editar Treinos</h2>
-            <div id="edit-schedule-list" class="space-y-3">
+        <div id="edit-schedule-card" class="w-full max-w-sm bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl p-4 transform scale-95 transition-all duration-300">
+            <h2 class="text-xl font-bold text-center text-orange-400 mb-3">Editar Treinos</h2>
+            <div id="edit-schedule-list" class="space-y-2">
                 <!-- Conteúdo do modal será gerado pelo JS -->
             </div>
-            <div class="flex justify-end gap-3 mt-6">
+            <div class="flex justify-end gap-3 mt-4">
                 <button id="cancel-edit-btn" class="px-5 py-2 bg-gray-600 hover:bg-gray-500 rounded-lg font-semibold transition-colors text-sm">Cancelar</button>
                 <button id="save-edit-btn" class="px-5 py-2 bg-orange-600 hover:bg-orange-500 rounded-lg font-bold text-white transition-colors text-sm">Salvar</button>
             </div>
@@ -1142,4 +1160,5 @@
     </script>
 </body>
 </html>
+
 
