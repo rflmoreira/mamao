@@ -292,15 +292,15 @@
     </div>
     
     <!-- Modal de Edição de Treinos -->
-    <div id="edit-schedule-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-all duration-300">
-        <div id="edit-schedule-card" class="w-full max-w-sm bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl px-4 py-3 transform scale-95 transition-all duration-300">
-            <h2 class="text-xl font-bold text-center text-orange-400 mb-2">Editar Treinos</h2>
-            <div id="edit-schedule-list" class="space-y-1.5">
+    <div id="edit-schedule-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-opacity duration-500">
+        <div id="edit-schedule-card" class="w-full max-w-sm bg-gray-800/50 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-4 transform scale-95 transition-all duration-500">
+            <h2 class="text-xl font-bold text-center text-orange-400 mb-3">Editar Treinos</h2>
+            <div id="edit-schedule-list" class="space-y-2">
                 <!-- Conteúdo do modal será gerado pelo JS -->
             </div>
-            <div class="flex justify-end gap-3 mt-3">
-                <button id="cancel-edit-btn" class="px-5 py-1.5 bg-gray-600 hover:bg-gray-500 rounded-lg font-semibold transition-colors text-sm">Cancelar</button>
-                <button id="save-edit-btn" class="px-5 py-1.5 bg-orange-600 hover:bg-orange-500 rounded-lg font-bold text-white transition-colors text-sm">Salvar</button>
+            <div class="flex justify-end gap-3 mt-4">
+                <button id="cancel-edit-btn" class="px-5 py-2 bg-gray-600/80 hover:bg-gray-500/80 rounded-lg font-semibold transition-colors text-sm">Cancelar</button>
+                <button id="save-edit-btn" class="px-5 py-2 bg-orange-600 hover:bg-orange-500 rounded-lg font-bold text-white transition-colors text-sm">Salvar</button>
             </div>
         </div>
     </div>
@@ -326,6 +326,7 @@
         };
 
         const dom = {
+            mainContent: document.getElementById('main-content'),
             stepperNav: document.getElementById('stepper-nav'),
             daySelector: document.getElementById('day-selector'),
             workoutDetails: document.getElementById('workout-details'),
@@ -925,11 +926,13 @@
                 dom.editScheduleList.appendChild(row);
             });
 
+            dom.mainContent.classList.add('blur-sm', 'scale-105');
             dom.editScheduleModal.classList.remove('invisible', 'opacity-0');
             dom.editScheduleCard.classList.remove('scale-95');
         }
 
         function closeEditModal() {
+            dom.mainContent.classList.remove('blur-sm', 'scale-105');
             dom.editScheduleModal.classList.add('invisible', 'opacity-0');
             dom.editScheduleCard.classList.add('scale-95');
         }
@@ -982,7 +985,6 @@
             renderAll();
             
             // --- LÓGICA DO PLAYER ---
-            const mainContent = document.getElementById('main-content');
             const openPlayerBtn = document.getElementById('open-player-btn');
             const closePlayerBtn = document.getElementById('close-player-btn');
             const playerModal = document.getElementById('player-modal');
@@ -997,13 +999,13 @@
             const openModal = () => {
                 playerModal.classList.remove('invisible', 'opacity-0');
                 playerCard.classList.remove('scale-95');
-                mainContent.classList.add('blur-sm', 'scale-105');
+                dom.mainContent.classList.add('blur-sm', 'scale-105');
             };
 
             const closeModal = () => {
                 playerModal.classList.add('invisible', 'opacity-0');
                 playerCard.classList.add('scale-95');
-                mainContent.classList.remove('blur-sm', 'scale-105');
+                dom.mainContent.classList.remove('blur-sm', 'scale-105');
             };
 
             closePlayerBtn.addEventListener('click', closeModal);
