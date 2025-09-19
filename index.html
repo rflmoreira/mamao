@@ -648,15 +648,18 @@
             const totalExercises = workout.exercises.length;
             const completedExercises = Object.values(appState.completionStatus).filter(Boolean).length;
             const progress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
+            const allDone = completedExercises >= totalExercises;
             
             dom.completeWorkoutBtn.disabled = false;
 
-            if (completedExercises >= totalExercises) {
+            if (allDone) {
                 dom.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
                 dom.completeWorkoutBtn.classList.add('bg-green-600/80', 'hover:bg-green-500');
+                dom.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-arrow-right text-2xl'></i> Avançar Treino`;
             } else {
                 dom.completeWorkoutBtn.classList.remove('bg-green-600/80', 'hover:bg-green-500');
                 dom.completeWorkoutBtn.classList.add('bg-gray-600/80', 'hover:bg-gray-500');
+                dom.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-checks text-2xl'></i> Concluir Treino`;
             }
 
             dom.progressBarContainer.innerHTML = `
@@ -814,16 +817,35 @@
         
         // --- Manipuladores de Eventos e Inicialização ---
         function handleCompleteWorkout() {
-             // MODIFICADO: Marca todos os exercícios como concluídos ao clicar no botão
             const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
             const workoutLetter = phaseData.schedule[appState.currentDay];
             const workout = phaseData.workouts[workoutLetter];
-            if (workout) {
+            if (!workout) return;
+
+            const totalExercises = workout.exercises.length;
+            const completedExercises = Object.values(appState.completionStatus).filter(Boolean).length;
+            const isWorkoutFinished = completedExercises >= totalExercises;
+
+            // Se o treino AINDA NÃO estiver finalizado (botão cinza)
+            if (!isWorkoutFinished) {
+                // Marca todos os exercícios como completos
                 workout.exercises.forEach((_, index) => {
                     appState.completionStatus[index] = true;
                 });
+
+                // Salva o status de conclusão
+                const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
+                appState.allCompletions[key] = appState.completionStatus;
+                saveState();
+
+                // Apenas renderiza novamente a visão do treino atual. Isso vai atualizar
+                // os checkboxes, a barra de progresso e a cor/texto do botão para verde.
+                renderWorkout();
+                return; // Para a execução aqui.
             }
 
+            // Se o treino JÁ estiver finalizado (botão verde)
+            // Esta parte só será executada no segundo clique
             myConfetti({
                 particleCount: 150,
                 spread: 90,
@@ -831,9 +853,6 @@
                 colors: ['#f97316', '#fb923c', '#fed7aa', '#ffffff']
             });
             
-            const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
-            appState.allCompletions[key] = appState.completionStatus;
-
             const currentPhaseData = getPhaseDataByWeek(appState.currentWeekNumber);
             const dayKeys = Object.keys(currentPhaseData.schedule);
             const currentDayIndex = dayKeys.indexOf(appState.currentDay);
