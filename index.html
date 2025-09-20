@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="HyperFitness - Seu aplicativo de treinos personalizados">
     <title>HyperFitness - Treinos Personalizados</title>
     <!-- Bibliotecas Externas -->
@@ -24,6 +24,19 @@
         body {
             font-family: 'Inter', sans-serif;
             padding-bottom: 100px;
+            /* Desabilitar zoom por duplo toque no mobile */
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Desabilitar zoom por duplo toque em todos os elementos */
+        * {
+            touch-action: manipulation;
         }
 
         /* ==========================================
