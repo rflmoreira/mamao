@@ -527,6 +527,55 @@
         }
         
         /**
+         * Exibir uma notificação flutuante
+         * @param {string} message - A mensagem a ser exibida
+         */
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-5 right-5 bg-red-600 text-white text-sm font-bold px-4 py-3 rounded-lg shadow-lg z-[200] animate-fadeIn';
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease-out';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        /**
+         * Verificar se todos os treinos de uma semana foram concluídos
+         * @param {number} weekNumber - O número da semana a ser verificada
+         * @returns {boolean} - True se todos os treinos estiverem completos, senão false
+         */
+        function areAllWeekWorkoutsCompleted(weekNumber) {
+            const phaseData = getPhaseDataByWeek(weekNumber);
+            if (!phaseData) return false;
+
+            const schedule = phaseData.schedule;
+            const dayKeys = Object.keys(schedule);
+
+            for (const day of dayKeys) {
+                const workoutLetter = schedule[day];
+                if (workoutLetter !== 'OFF') {
+                    const workout = phaseData.workouts[workoutLetter];
+                    if (workout) {
+                        const totalExercises = workout.exercises.length;
+                        const completionKey = `week${weekNumber}-${day}`;
+                        const dayCompletions = APP_STATE.allCompletions[completionKey] || {};
+                        const completedCount = Object.values(dayCompletions).filter(Boolean).length;
+                        
+                        if (completedCount < totalExercises) {
+                            return false; // Encontrou um treino não concluído
+                        }
+                    }
+                }
+            }
+            return true; // Todos os treinos da semana foram concluídos
+        }
+
+        /**
          * Resetar o estado da aplicação para os valores iniciais
          */
         function resetApplicationState() {
@@ -844,43 +893,39 @@
          */
         function renderWorkoutDetails() {
             const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
-            if (!phaseData) return; 
-            
+            if (!phaseData) return;
+
             const workoutLetter = phaseData.schedule[APP_STATE.currentDay];
             DOM_ELEMENTS.workoutDetails.innerHTML = '';
             DOM_ELEMENTS.workoutTitle.innerHTML = '';
             DOM_ELEMENTS.progressBarContainer.innerHTML = '';
             DOM_ELEMENTS.footer.style.display = 'none';
 
-            // Gerenciar dia de descanso
             if (workoutLetter === 'OFF' || !phaseData.workouts[workoutLetter]) {
                 DOM_ELEMENTS.workoutTitle.innerHTML = `<h2 class="text-2xl font-bold text-gray-400">Dia de Descanso</h2>`;
                 return;
             }
-            
+
             DOM_ELEMENTS.footer.style.display = 'block';
 
             const workout = phaseData.workouts[workoutLetter];
             DOM_ELEMENTS.workoutTitle.innerHTML = `<h2 class="text-3xl font-bold text-white">${workout.name}</h2>`;
-            
-            // Calcular progresso
+
             const totalExercises = workout.exercises.length;
             const completedExercises = Object.values(APP_STATE.completionStatus).filter(Boolean).length;
             const progress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
             const allDone = completedExercises >= totalExercises;
-            
+
+            const dayKeys = Object.keys(phaseData.schedule);
+            const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
             const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
-                               Object.keys(phaseData.schedule).indexOf(APP_STATE.currentDay) === APP_STATE.highestUnlockedDayIndex;
+                               currentDayIndex === APP_STATE.highestUnlockedDayIndex;
 
             DOM_ELEMENTS.completeWorkoutBtn.disabled = !isCurrentProgressDay;
-
-            // Atualizar aparência do botão baseado no status de conclusão
             updateWorkoutButton(allDone);
 
-            // Renderizar barra de progresso
             renderProgressBar(completedExercises, totalExercises, progress);
 
-            // Renderizar exercícios com otimização de performance
             const fragment = document.createDocumentFragment();
             workout.exercises.forEach((exercise, index) => {
                 const exerciseCard = createExerciseCard(exercise, index);
@@ -894,18 +939,16 @@
          * @param {boolean} allDone - Se todos os exercícios estão concluídos
          */
         function updateWorkoutButton(allDone) {
-            // Verificar se é um treino passado (não é o treino atual do progresso)
             const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             const dayKeys = Object.keys(phaseData.schedule);
             const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
             const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
                                currentDayIndex === APP_STATE.highestUnlockedDayIndex;
-            
+
             if (allDone) {
                 DOM_ELEMENTS.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
                 DOM_ELEMENTS.completeWorkoutBtn.classList.add('bg-green-600/80', 'hover:bg-green-500');
-                
-                // Se não é o treino atual, mostrar "Treino Feito", senão "Avançar Treino"
+
                 if (!isCurrentProgressDay) {
                     DOM_ELEMENTS.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-check-circle text-2xl' aria-hidden="true"></i> Treino Feito`;
                 } else {
@@ -944,16 +987,13 @@
          */
         function createExerciseCard(exercise, index) {
             const isCompleted = APP_STATE.completionStatus[index];
-            
-            // Verificar se é um treino passado (não é o treino atual do progresso)
             const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             const dayKeys = Object.keys(phaseData.schedule);
             const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
-            const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
-                               currentDayIndex === APP_STATE.highestUnlockedDayIndex;
+            const isPastWorkout = APP_STATE.currentWeekNumber < APP_STATE.highestUnlockedWeek ||
+                (APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek && currentDayIndex < APP_STATE.highestUnlockedDayIndex);
             
-            // Se não é o treino atual E está concluído, não permitir interação
-            const isLocked = !isCurrentProgressDay && isCompleted;
+            const isLocked = isPastWorkout && isCompleted;
             
             const card = document.createElement('div');
             card.className = `bg-gray-800 rounded-xl shadow-lg border border-gray-700 transition-all duration-300 flex flex-col ${isCompleted ? 'exercise-completed' : ''}`;
@@ -1013,16 +1053,14 @@
             
             const index = parseInt(toggleWrapper.dataset.index);
             
-            // Verificar se é um treino passado (não é o treino atual do progresso)
             const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             const dayKeys = Object.keys(phaseData.schedule);
             const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
-            const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
-                               currentDayIndex === APP_STATE.highestUnlockedDayIndex;
+            const isPastWorkout = APP_STATE.currentWeekNumber < APP_STATE.highestUnlockedWeek ||
+                               (APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek && currentDayIndex < APP_STATE.highestUnlockedDayIndex);
             
-            // Se não é o treino atual E o exercício já está concluído, não permitir desmarcar
-            if (!isCurrentProgressDay && APP_STATE.completionStatus[index]) {
-                return; // Bloqueia a desmarcação
+            if (isPastWorkout && APP_STATE.completionStatus[index]) {
+                return;
             }
             
             APP_STATE.completionStatus[index] = !APP_STATE.completionStatus[index];
@@ -1115,24 +1153,19 @@
             const completedExercises = Object.values(APP_STATE.completionStatus).filter(Boolean).length;
             const isWorkoutFinished = completedExercises >= totalExercises;
 
-            // Se o treino ainda não foi finalizado (botão cinza)
+            // Primeiro clique: Marcar tudo como concluído se ainda não estiver
             if (!isWorkoutFinished) {
-                // Marca todos os exercícios como concluídos
                 workout.exercises.forEach((_, index) => {
                     APP_STATE.completionStatus[index] = true;
                 });
-
-                // Salva status de conclusão
                 const key = `week${APP_STATE.currentWeekNumber}-${APP_STATE.currentDay}`;
                 APP_STATE.allCompletions[key] = APP_STATE.completionStatus;
                 saveApplicationState();
-
-                // Re-renderiza a visualização do treino
                 renderWorkoutDetails();
                 return;
             }
 
-            // Se o treino já foi finalizado (botão verde) - segundo clique
+            // Segundo clique: Avançar para o próximo treino/semana
             confettiInstance({
                 particleCount: 150,
                 spread: 90,
@@ -1140,24 +1173,45 @@
                 colors: ['#f97316', '#fb923c', '#fed7aa', '#ffffff']
             });
             
-            const currentPhaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
-            const dayKeys = Object.keys(currentPhaseData.schedule);
+            const dayKeys = Object.keys(phaseData.schedule);
             const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
 
+            // Apenas permite o avanço se estiver no dia/semana de progresso atual
+            const isAtProgressFrontier = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek && 
+                                         currentDayIndex === APP_STATE.highestUnlockedDayIndex;
+            
+            if (!isAtProgressFrontier) return;
+
+            // Encontra o próximo dia de treino
             let nextDayIndex = currentDayIndex + 1;
-            while(nextDayIndex < dayKeys.length && currentPhaseData.schedule[dayKeys[nextDayIndex]] === 'OFF') {
+            while(nextDayIndex < dayKeys.length && phaseData.schedule[dayKeys[nextDayIndex]] === 'OFF') {
                 nextDayIndex++;
             }
             
-            let isLastTrainingDay = !dayKeys.slice(currentDayIndex + 1).some(day => currentPhaseData.schedule[day] !== 'OFF');
+            // Verifica se é o último dia de treino da semana
+            const isLastTrainingDay = nextDayIndex >= dayKeys.length;
 
             if (isLastTrainingDay) {
+                // VERIFICAÇÃO ADICIONADA: Checar se todos os treinos da semana estão completos
+                if (!areAllWeekWorkoutsCompleted(APP_STATE.currentWeekNumber)) {
+                    showNotification("Conclua todos os treinos da semana para avançar!");
+                    return; // Impede o avanço para a próxima semana
+                }
+
                 if (APP_STATE.highestUnlockedWeek < 12) {
                     APP_STATE.highestUnlockedWeek++;
-                    APP_STATE.highestUnlockedDayIndex = 0;
                     APP_STATE.currentWeekNumber = APP_STATE.highestUnlockedWeek;
+                    
                     const nextPhaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
-                    APP_STATE.currentDay = Object.keys(nextPhaseData.schedule)[0];
+                    const nextDayKeys = Object.keys(nextPhaseData.schedule);
+                    
+                    let firstDayIndex = 0;
+                    while(firstDayIndex < nextDayKeys.length && nextPhaseData.schedule[nextDayKeys[firstDayIndex]] === 'OFF') {
+                       firstDayIndex++;
+                    }
+                    APP_STATE.highestUnlockedDayIndex = firstDayIndex;
+                    APP_STATE.currentDay = nextDayKeys[firstDayIndex];
+
                 } else {
                     saveApplicationState();
                     showCompletionMessage();
@@ -1176,6 +1230,7 @@
                 window.scrollTo(0, 0);
             }, 300);
         }
+
 
         // ==========================================
         // FUNÇÕES DE MODAL
@@ -1503,4 +1558,5 @@
     </script>
 </body>
 </html>
+
 
