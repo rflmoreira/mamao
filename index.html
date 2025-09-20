@@ -918,10 +918,11 @@
 
             const dayKeys = Object.keys(phaseData.schedule);
             const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
-            const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
-                               currentDayIndex === APP_STATE.highestUnlockedDayIndex;
-
-            DOM_ELEMENTS.completeWorkoutBtn.disabled = !isCurrentProgressDay;
+            const isPastWorkout = APP_STATE.currentWeekNumber < APP_STATE.highestUnlockedWeek ||
+                (APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek && currentDayIndex < APP_STATE.highestUnlockedDayIndex);
+            
+            DOM_ELEMENTS.completeWorkoutBtn.disabled = isPastWorkout;
+            
             updateWorkoutButton(allDone);
 
             renderProgressBar(completedExercises, totalExercises, progress);
@@ -942,14 +943,14 @@
             const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             const dayKeys = Object.keys(phaseData.schedule);
             const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
-            const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
-                               currentDayIndex === APP_STATE.highestUnlockedDayIndex;
+            const isPastWorkout = APP_STATE.currentWeekNumber < APP_STATE.highestUnlockedWeek ||
+                (APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek && currentDayIndex < APP_STATE.highestUnlockedDayIndex);
 
             if (allDone) {
                 DOM_ELEMENTS.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
                 DOM_ELEMENTS.completeWorkoutBtn.classList.add('bg-green-600/80', 'hover:bg-green-500');
 
-                if (!isCurrentProgressDay) {
+                if (isPastWorkout) {
                     DOM_ELEMENTS.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-check-circle text-2xl' aria-hidden="true"></i> Treino Feito`;
                 } else {
                     DOM_ELEMENTS.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-arrow-right text-2xl' aria-hidden="true"></i> Avançar Treino`;
@@ -1558,5 +1559,4 @@
     </script>
 </body>
 </html>
-
 
