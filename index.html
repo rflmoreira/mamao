@@ -1,32 +1,68 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-g">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HypeFit</title>
+    <meta name="description" content="HypeFit - Seu aplicativo de treinos personalizados">
+    <title>HypeFit - Treinos Personalizados</title>
+    <!-- Bibliotecas Externas -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    
+    <!-- Fontes -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <!-- Phosphor Icons -->
+    
+    <!-- Ícones -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
     <style>
+        /* ==========================================
+           ESTILOS BASE
+        ========================================== */
         body {
             font-family: 'Inter', sans-serif;
-            padding-bottom: 100px; /* Espaço para o rodapé fixo */
+            padding-bottom: 100px;
         }
-        /* Barra de rolagem personalizada */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #111827; }
-        ::-webkit-scrollbar-thumb { background: #f97316; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #fb923c; }
+
+        /* ==========================================
+           CUSTOMIZAÇÃO DA BARRA DE ROLAGEM
+        ========================================== */
+        ::-webkit-scrollbar { 
+            width: 8px; 
+            height: 8px; 
+        }
         
-        /* Animações */
-        .workout-list-enter { animation: fadeIn 0.5s ease-in-out; }
+        ::-webkit-scrollbar-track { 
+            background: #111827; 
+        }
+        
+        ::-webkit-scrollbar-thumb { 
+            background: #f97316; 
+            border-radius: 10px; 
+        }
+        
+        ::-webkit-scrollbar-thumb:hover { 
+            background: #fb923c; 
+        }
+
+        /* ==========================================
+           ANIMAÇÕES
+        ========================================== */
+        .workout-list-enter { 
+            animation: fadeIn 0.5s ease-in-out; 
+        }
+        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
 
         @keyframes pulse {
@@ -39,8 +75,14 @@
                 box-shadow: 0 0 0 6px rgba(249, 115, 22, 0);
             }
         }
+        
         .current-week-marker-animation {
             animation: pulse 2s infinite;
+        }
+
+        @keyframes stripe-animation {
+            from { background-position: 0 0; }
+            to { background-position: 28px 0; }
         }
 
         .progress-bar-striped {
@@ -55,25 +97,34 @@
             animation: stripe-animation 1s linear infinite;
         }
 
-        @keyframes stripe-animation {
-            from { background-position: 0 0; }
-            to { background-position: 28px 0; }
+        /* ==========================================
+        /* ==========================================
+           ESTILOS DOS COMPONENTES
+        ========================================== */
+        
+        /* Tooltip */
+        .step-tooltip { 
+            visibility: hidden; 
+            opacity: 0; 
+            transition: opacity 0.3s; 
         }
         
-        /* Tooltip personalizado */
-        .step-tooltip { visibility: hidden; opacity: 0; transition: opacity 0.3s; }
-        .group:hover .step-tooltip { visibility: visible; opacity: 1; }
+        .group:hover .step-tooltip { 
+            visibility: visible; 
+            opacity: 1; 
+        }
         
-        /* Estilo do exercício completo */
+        /* Finalização de Exercício */
         .exercise-completed {
             opacity: 0.6;
             background-color: #1f2937;
         }
+        
         .exercise-completed h3 {
             text-decoration: line-through;
         }
 
-        /* Estilos para o novo check animado */
+        /* Checkbox Animado */
         .animated-check-container {
             width: 32px;
             height: 32px;
@@ -86,9 +137,9 @@
         }
 
         .animated-check-circle {
-            stroke: #4b5563; /* gray-600 */
+            stroke: #4b5563;
             stroke-width: 3;
-            fill: rgba(75, 85, 99, 0.2); /* bg-gray-600 com opacidade */
+            fill: rgba(75, 85, 99, 0.2);
             transition: stroke 0.4s ease, fill 0.4s ease;
         }
 
@@ -104,70 +155,15 @@
         }
 
         .animated-check-container.completed .animated-check-circle {
-            stroke: #16a34a; /* green-600 */
-            fill: rgba(22, 163, 74, 0.2); /* bg-green-600 com opacidade */
+            stroke: #16a34a;
+            fill: rgba(22, 163, 74, 0.2);
         }
 
         .animated-check-container.completed .animated-check-path {
             stroke-dashoffset: 0;
         }
-        
-        /* Melhorias no stepper mobile */
-        @media (max-width: 768px) {
-            #stepper-nav {
-                overflow-x: hidden;
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
-            }
-            
-            .step-tooltip {
-                font-size: 9px;
-                padding: 1px 4px;
-                margin-bottom: 4px;
-            }
-            
-            /* Otimização do seletor de dias para mobile */
-            #day-selector {
-                padding: 0.375rem;
-                gap: 0.125rem;
-            }
-            
-            #day-selector button {
-                font-size: 11px;
-                padding: 0.375rem 0.25rem;
-            }
-            
-            /* Ajuste do degradê do cabeçalho para mobile */
-            .header-background::before {
-                background: linear-gradient(
-                    to bottom,
-                    rgba(17, 24, 39, 0.6) 0%,
-                    rgba(17, 24, 39, 0.7) 60%,
-                    rgba(17, 24, 39, 0.85) 75%,
-                    rgba(17, 24, 39, 0.95) 90%,
-                    rgba(17, 24, 39, 1) 100%
-                );
-            }
-        }
 
-        /* Ajuste para telas pequenas como iPhone SE */
-        @media (max-height: 680px) {
-            #edit-schedule-modal {
-                padding-top: 1rem;
-                padding-bottom: 1rem;
-            }
-            #edit-schedule-card {
-                max-height: calc(100vh - 2rem); /* Altura máxima - padding */
-                display: flex;
-                flex-direction: column;
-            }
-            #edit-schedule-list {
-                overflow-y: auto; /* Habilita scroll na lista */
-                flex-shrink: 1;
-            }
-        }
-
-        /* Background da parte superior da página */
+        /* Fundo do Cabeçalho */
         .header-background {
             background-image: url('imagens/ambitious-studio-rick-barrett-lTTjG469mHk-unsplash.jpg');
             background-size: cover;
@@ -176,7 +172,7 @@
             position: relative;
             margin-left: calc(-50vw + 50%);
             margin-right: calc(-50vw + 50%);
-            margin-top: calc(-1rem - 1.5rem); /* Remove padding do container pai */
+            margin-top: calc(-1rem - 1.5rem);
             width: 100vw;
             padding-left: calc(50vw - 50%);
             padding-right: calc(50vw - 50%);
@@ -204,71 +200,157 @@
             position: relative;
             z-index: 2;
         }
+
+        /* ==========================================
+           DESIGN RESPONSIVO
+        ========================================== */
+        @media (max-width: 768px) {
+            #stepper-nav {
+                overflow-x: hidden;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            .step-tooltip {
+                font-size: 9px;
+                padding: 1px 4px;
+                margin-bottom: 4px;
+            }
+            
+            #day-selector {
+                padding: 0.375rem;
+                gap: 0.125rem;
+            }
+            
+            #day-selector button {
+                font-size: 11px;
+                padding: 0.375rem 0.25rem;
+            }
+            
+            .header-background::before {
+                background: linear-gradient(
+                    to bottom,
+                    rgba(17, 24, 39, 0.6) 0%,
+                    rgba(17, 24, 39, 0.7) 60%,
+                    rgba(17, 24, 39, 0.85) 75%,
+                    rgba(17, 24, 39, 0.95) 90%,
+                    rgba(17, 24, 39, 1) 100%
+                );
+            }
+        }
+
+        @media (max-height: 680px) {
+            #edit-schedule-modal {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+            
+            #edit-schedule-card {
+                max-height: calc(100vh - 2rem);
+                display: flex;
+                flex-direction: column;
+            }
+            
+            #edit-schedule-list {
+                overflow-y: auto;
+                flex-shrink: 1;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
-
+    <!-- ==========================================
+         CONTAINER PRINCIPAL DO CONTEÚDO
+    ========================================== -->
     <div id="main-content" class="container mx-auto p-4 md:p-6 max-w-4xl transition-all duration-500">
 
-        <!-- Cabeçalho -->
+        <!-- Seção do Cabeçalho -->
         <header class="text-center mb-10 header-background py-12">
             <div class="flex justify-center items-center h-32">
                 <img src="imagens\HypeFit.png" 
                      alt="HyperFit Logo" 
-                     class="h-24 md:h-32 w-auto drop-shadow-lg">
+                     class="h-24 md:h-32 w-auto drop-shadow-lg"
+                     loading="lazy">
             </div>
         </header>
 
         <!-- Cabeçalho da Fase -->
-        <div id="phase-header" class="text-center mb-6">
-            <!-- Título da fase e progresso da semana serão inseridos aqui -->
-        </div>
+        <section id="phase-header" class="text-center mb-6" role="banner">
+            <!-- Conteúdo dinâmico será inserido aqui -->
+        </section>
 
-        <!-- Navegação das Semanas/Níveis -->
-        <div class="bg-gray-800 p-2 rounded-lg mb-8">
+        <!-- Navegação por Semana -->
+        <nav class="bg-gray-800 p-2 rounded-lg mb-8" aria-label="Navegação por semanas">
             <div id="stepper-nav" class="py-2 overflow-hidden">
-                <!-- Stepper compacto será inserido aqui pelo JS -->
+                <!-- Navegador dinâmico será inserido aqui -->
             </div>
-        </div>
+        </nav>
 
         <!-- Seletor de Dia/Treino -->
-        <div id="day-selector" class="flex justify-center items-center gap-1 md:gap-2 mb-8 bg-gray-800 p-2 rounded-lg overflow-hidden">
-             <!-- Abas dos dias serão inseridas aqui pelo JS -->
-        </div>
+        <nav id="day-selector" 
+             class="flex justify-center items-center gap-1 md:gap-2 mb-8 bg-gray-800 p-2 rounded-lg overflow-hidden" 
+             aria-label="Seleção de dia de treino">
+             <!-- Abas dinâmicas dos dias serão inseridas aqui -->
+        </nav>
         
         <!-- Container do Treino Atual -->
-        <div id="current-workout-container" class="workout-list-enter">
-            <div id="workout-title" class="text-center mb-4 min-h-[32px]"></div>
+        <main id="current-workout-container" class="workout-list-enter">
+            <header id="workout-title" class="text-center mb-4 min-h-[32px]"></header>
             <div id="progress-bar-container" class="mb-6 px-2"></div>
-            <main id="workout-details" class="space-y-4">
-                <!-- Lista de exercícios será inserida aqui pelo JS -->
-            </main>
-        </div>
+            <section id="workout-details" class="space-y-4">
+                <!-- Lista dinâmica de exercícios será inserida aqui -->
+            </section>
+        </main>
     </div>
 
-    <!-- Botão Fixo do Rodapé -->
+    <!-- ==========================================
+         SEÇÃO DO RODAPÉ
+    ========================================== -->
     <footer id="footer-container" class="fixed bottom-0 left-0 right-0 p-4 z-40">
         <div class="container mx-auto max-w-4xl">
-            <button id="complete-workout-btn" class="w-full bg-gray-600/80 backdrop-blur-sm text-white font-bold py-3 px-6 rounded-3xl text-lg hover:bg-gray-500 disabled:bg-gray-600/80 disabled:backdrop-blur-sm disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl shadow-black/50">
-                 <i class='ph-bold ph-checks text-2xl'></i>
+            <button id="complete-workout-btn" 
+                    class="w-full bg-gray-600/80 backdrop-blur-sm text-white font-bold py-3 px-6 rounded-3xl text-lg hover:bg-gray-500 disabled:bg-gray-600/80 disabled:backdrop-blur-sm disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-2xl shadow-black/50"
+                    aria-label="Concluir treino atual">
+                 <i class='ph-bold ph-checks text-2xl' aria-hidden="true"></i>
                 Concluir Treino
             </button>
         </div>
     </footer>
     
-    <canvas id="confetti-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]"></canvas>
+    <!-- ==========================================
+         ELEMENTOS FLUTUANTES
+    ========================================== -->
+    
+    <!-- Canvas de Confete -->
+    <canvas id="confetti-canvas" 
+            class="fixed top-0 left-0 w-full h-full pointer-events-none z-[100]" 
+            aria-hidden="true"></canvas>
 
-    <!-- Botão Flutuante de Música -->
-    <button id="open-player-btn" class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 z-40 flex items-center justify-center cursor-grab active:cursor-grabbing">
-        <i class='ph-fill ph-music-notes-simple text-2xl'></i>
+    <!-- Botão do Player de Música -->
+    <button id="open-player-btn" 
+            class="fixed top-1/2 right-0 -translate-y-1/2 mr-4 md:mr-6 bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 z-40 flex items-center justify-center cursor-grab active:cursor-grabbing"
+            aria-label="Abrir player de música">
+        <i class='ph-fill ph-music-notes-simple text-2xl' aria-hidden="true"></i>
     </button>
+
+    <!-- ==========================================
+         MODAIS
+    ========================================== -->
     
     <!-- Modal do Player de Música -->
-    <div id="player-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-opacity duration-500">
-        <!-- Card do Player -->
+    <div id="player-modal" 
+         class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-opacity duration-500"
+         role="dialog" 
+         aria-labelledby="player-title" 
+         aria-hidden="true">
+         
         <div id="player-card" class="w-full max-w-sm bg-gray-800/50 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-6 transform scale-95 transition-all duration-500 relative">
             <!-- Capa do Álbum -->
-            <img id="album-art" src="imagens/EDM.png" alt="Capa do Álbum" class="w-full rounded-lg shadow-lg aspect-square">
+            <img id="album-art" 
+                 src="imagens/EDM.png" 
+                 alt="Capa do Álbum" 
+                 class="w-full rounded-lg shadow-lg aspect-square"
+                 loading="lazy">
 
             <!-- Informações da Música -->
             <div class="text-center mt-6">
@@ -278,45 +360,79 @@
 
             <!-- Controles de Reprodução -->
             <div class="flex items-center justify-center gap-6 mt-8">
-                <button id="play-pause-btn" class="bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 flex items-center justify-center">
-                    <i id="play-icon" class='ph-fill ph-play text-3xl'></i>
-                    <i id="stop-icon" class='ph-fill ph-stop text-3xl hidden'></i>
+                <button id="play-pause-btn" 
+                        class="bg-orange-600/80 backdrop-blur-sm text-white w-16 h-16 rounded-full shadow-2xl hover:bg-orange-500 flex items-center justify-center"
+                        aria-label="Reproduzir/Pausar música">
+                    <i id="play-icon" class='ph-fill ph-play text-3xl' aria-hidden="true"></i>
+                    <i id="stop-icon" class='ph-fill ph-stop text-3xl hidden' aria-hidden="true"></i>
                 </button>
             </div>
 
             <!-- Botão Fechar -->
-            <button id="close-player-btn" class="absolute bottom-4 right-4 bg-red-600/80 backdrop-blur-sm text-white w-12 h-12 rounded-full shadow-2xl hover:bg-red-500 flex items-center justify-center z-10">
-                <i class='ph-bold ph-x text-2xl'></i>
+            <button id="close-player-btn" 
+                    class="absolute bottom-4 right-4 bg-red-600/80 backdrop-blur-sm text-white w-12 h-12 rounded-full shadow-2xl hover:bg-red-500 flex items-center justify-center z-10"
+                    aria-label="Fechar player">
+                <i class='ph-bold ph-x text-2xl' aria-hidden="true"></i>
             </button>
         </div>
     </div>
     
-    <!-- Modal de Edição de Treinos -->
-    <div id="edit-schedule-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-opacity duration-500">
+    <!-- Modal de Edição da Programação -->
+    <div id="edit-schedule-modal" 
+         class="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4 opacity-0 invisible transition-opacity duration-500"
+         role="dialog" 
+         aria-labelledby="edit-title" 
+         aria-hidden="true">
+         
         <div id="edit-schedule-card" class="w-full max-w-sm bg-gray-800/50 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-4 transform scale-95 transition-all duration-500">
-            <h2 class="text-xl font-bold text-center text-orange-400 mb-3">Editar Treinos</h2>
+            <h2 id="edit-title" class="text-xl font-bold text-center text-orange-400 mb-3">Editar Treinos</h2>
             <div id="edit-schedule-list" class="space-y-2">
-                <!-- Conteúdo do modal será gerado pelo JS -->
+                <!-- Conteúdo dinâmico será inserido aqui -->
             </div>
             <div class="flex justify-end gap-3 mt-4">
-                <button id="cancel-edit-btn" class="px-5 py-2 bg-gray-600/80 hover:bg-gray-500/80 rounded-lg font-semibold transition-colors text-sm">Cancelar</button>
-                <button id="save-edit-btn" class="px-5 py-2 bg-orange-600 hover:bg-orange-500 rounded-lg font-bold text-white transition-colors text-sm">Salvar</button>
+                <button id="cancel-edit-btn" 
+                        class="px-5 py-2 bg-gray-600/80 hover:bg-gray-500/80 rounded-lg font-semibold transition-colors text-sm"
+                        aria-label="Cancelar edição">
+                    Cancelar
+                </button>
+                <button id="save-edit-btn" 
+                        class="px-5 py-2 bg-orange-600 hover:bg-orange-500 rounded-lg font-bold text-white transition-colors text-sm"
+                        aria-label="Salvar alterações">
+                    Salvar
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Elemento de áudio para reprodução -->
-    <audio id="audio-player" src="https://stream.sunshine-live.de/edm/mp3-128/"></audio>
+    <!-- ==========================================
+         ELEMENTO DE ÁUDIO
+    ========================================== -->
+    <audio id="audio-player" 
+           src="https://stream.sunshine-live.de/edm/mp3-128/" 
+           preload="none"
+           aria-label="Player de áudio para música EDM"></audio>
 
     <script>
-        const workoutPhases = {
+        // ==========================================
+        // CONFIGURAÇÃO E DADOS DA APLICAÇÃO
+        // ==========================================
+        
+        /**
+         * Configuração das Fases de Treino
+         * Contém todos os dados de treino organizados por fases, semanas e detalhes dos exercícios
+         */
+        const WORKOUT_PHASES = {
             "phase1": { title: "Fase 1: Adaptação", weeks: [1], schedule: { "Seg": "A", "Ter": "B", "Qua": "C", "Qui": "A", "Sex": "B", "Sáb": "OFF", "Dom": "OFF" }, workouts: { "A": { name: "Treino A - Puxar", exercises: [ { name: "Pulley Frente Aberto", series: "3", rept: "8 a 12", descanso: "1 Min", method: "Convencional" }, { name: "Puxada Triângulo", series: "3", rept: "15 a 20", descanso: "1 Min", method: "Convencional" }, { name: "Remada Serrote", series: "3", rept: "15 a 20", descanso: "1 Min", method: "Convencional" }, { name: "Remada Baixa Triângulo", series: "3", rept: "15 a 20", descanso: "1 Min", method: "Convencional" }, { name: "Rosca Direta Barra Reta", series: "3", rept: "8 a 12", descanso: "1 Min", method: "Convencional" }, { name: "Tríceps Corda", series: "3", rept: "8 a 12", descanso: "1 Min", method: "Convencional" }, { name: "Rosca Martelo + Tríceps Francês (Corda)", series: "3", rept: "15 a 20", descanso: "1 Min", method: "BI-SET" } ] }, "B": { name: "Treino B - Pernas", exercises: [ { name: "Cadeira Extensora", series: "3", rept: "8 a 12", descanso: "90 seg", method: "Convencional" }, { name: "Leg Press 45", series: "3", rept: "8 a 12", descanso: "90 seg", method: "Convencional" }, { name: "Cadeira Adutora", series: "3", rept: "15 a 20", descanso: "90 seg", method: "Convencional" }, { name: "Cadeira Extensora (2)", series: "3", rept: "15 a 20", descanso: "90 seg", method: "Convencional" }, { name: "Cadeira Flexora", series: "4", rept: "8 a 12", descanso: "90 seg", method: "Convencional" }, { name: "Cadeira Abdutora", series: "3", rept: "15 a 20", descanso: "90 seg", method: "Convencional" } ] }, "C": { name: "Treino C - Empurrar", exercises: [ { name: "Supino Inclinado Máquina", series: "3", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Crucifixo Inclinado", series: "3", rept: "15 a 20", descanso: "60 seg", method: "Isometria" }, { name: "Supino Reto Máquina", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Desenvolvimento Máquina Aberto", series: "3", rept: "8 a 12", descanso: "60 seg", method: "Conv+Isometria" }, { name: "Elevação Lateral", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Convencional" }, { name: "Tríceps Paralela", series: "3", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Tríceps Corda", series: "3", rept: "15 a 20", descanso: "60 seg", method: "Convencional" } ] } } },
             "phase2": { title: "Fase 2: Aumento de Volume", weeks: [2, 3, 4, 5, 6], schedule: { "Seg": "A", "Ter": "B", "Qua": "C", "Qui": "OFF", "Sex": "D", "Sáb": "E", "Dom": "OFF" }, workouts: { "A": { name: "Treino A - Ombros", exercises: [ { name: "Desenvolvimento Máquina", series: "4", rept: "20/18/15/12", descanso: "1 Min", method: "Pirâmide Crescente" }, { name: "Elevação Lateral na Polia", series: "4", rept: "8 a 12", descanso: "1 Min", method: "Convencional" }, { name: "Elevação Lateral com Halter", series: "4", rept: "15 a 20", descanso: "1 Min", method: "Drop Set 1 descida" }, { name: "Elevação Frontal na Polia", series: "3", rept: "8 a 12", descanso: "1 Min", method: "Convencional" }, { name: "Elevação Frontal Barra", series: "3", rept: "15 a 20", descanso: "1 Min", method: "Convencional" }, { name: "Crucifixo Inverso Máquina", series: "3", rept: "8 a 12", descanso: "1 Min", method: "Convencional" }, { name: "Pull Face", series: "3", rept: "15 a 20", descanso: "1 Min", method: "Drop Set 1 descida" } ] }, "B": { name: "Treino B - Quadríceps", exercises: [ { name: "Cadeira Extensora", series: "3", rept: "15 a 20", descanso: "90 seg", method: "Convencional" }, { name: "Leg Press 45", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Agachamento Hack", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Cadeira Adutora", series: "4", rept: "15 a 20", descanso: "90 seg", method: "Convencional" }, { name: "Cadeira Extensora", series: "4", rept: "15 a 20", descanso: "90 seg", method: "Drop Set 1 descida" }, { name: "Panturrilha em Pé Máquina", series: "6", rept: "15 a 20", descanso: "45 seg", method: "Convencional" } ] }, "C": { name: "Treino C - Costas e Bíceps", exercises: [ { name: "Puxada Frente Aberta", series: "4", rept: "20/18/15/12", descanso: "60 seg", method: "Pirâmide Crescente" }, { name: "Barra Fixa", series: "3", rept: "Falha", descanso: "60 seg", method: "Convencional" }, { name: "Remada na Máquina Articulada", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Remada Baixa Triângulo", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Drop Set 1 descida" }, { name: "Remada Pronada na Máquina", series: "3", rept: "15 a 20", descanso: "60 seg", method: "Convencional" }, { name: "Rosca Direta Barra W", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Rosca Scott na Máquina com Barra W", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Drop Set 1 descida" } ] }, "D": { name: "Treino D - Peito e Tríceps", exercises: [ { name: "Supino Inclinado Máquina", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Pirâmide Crescente" }, { name: "Crucifixo Inclinado", series: "3", rept: "15 a 20", descanso: "60 seg", method: "Convencional" }, { name: "Supino Reto Máquina", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Crucifixo Máquina Reto", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Drop Set 1 descida" }, { name: "Tríceps Paralela", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Tríceps Corda", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Drop Set 1 descida" } ] }, "E": { name: "Treino E - Posterior e Glúteo", exercises: [ { name: "Mesa Flexora", series: "3", rept: "8 a 12", descanso: "90 seg", method: "Convencional" }, { name: "Cadeira Flexora", series: "4", rept: "12 a 15", descanso: "90 seg", method: "Drop Set 1 descida" }, { name: "Stiff", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Cadeira Abdutora", series: "3", rept: "15 a 20", descanso: "90 seg", method: "Convencional" }, { name: "Elevação Pélvica com Barra", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Panturrilha em Pé Máquina", series: "5", rept: "15 a 20", descanso: "90 seg", method: "Convencional" } ] } } },
             "phase3": { title: "Fase 3: Mais Volume e Técnicas", weeks: [7, 8, 9, 10], schedule: { "Seg": "A", "Ter": "B", "Qua": "C", "Qui": "OFF", "Sex": "D", "Sáb": "E", "Dom": "OFF" }, workouts: { "A": { name: "Treino A - Ombros", exercises: [ { name: "Desenvolvimento Máquina", series: "4", rept: "20/18/15/12", descanso: "1 Min", method: "Pirâmide Crescente" }, { name: "Elevação Lateral na Polia", series: "4", rept: "8 a 12", descanso: "1 Min", method: "Rest Pause Última Série" }, { name: "Elevação Lateral com Halter", series: "4", rept: "15 a 20", descanso: "1 Min", method: "Drop Set Todas as Séries" }, { name: "Elevação Frontal na Polia", series: "4", rept: "8 a 12", descanso: "1 Min", method: "Convencional" }, { name: "Elevação Frontal Barra", series: "4", rept: "15 a 20", descanso: "1 Min", method: "Rest Pause Última Série" }, { name: "Crucifixo Inverso Máquina", series: "4", rept: "8 a 12", descanso: "1 Min", method: "Convencional" }, { name: "Pull Face", series: "4", rept: "15 a 20", descanso: "1 Min", method: "Drop Set Todas as Séries" } ] }, "B": { name: "Treino B - Quadríceps", exercises: [ { name: "Cadeira Extensora", series: "4", rept: "15 a 20", descanso: "90 seg", method: "Convencional" }, { name: "Leg Press 45", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Agachamento Hack", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Agachamento Smith", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Cadeira Adutora", series: "4", rept: "15 a 20", descanso: "90 seg", method: "Convencional" }, { name: "Cadeira Extensora", series: "4", rept: "15 a 20", descanso: "90 seg", method: "Drop Set Todas as Séries" }, { name: "Panturrilha em Pé Máquina", series: "6", rept: "15 a 20", descanso: "45 seg", method: "Convencional" } ] }, "C": { name: "Treino C - Costas e Bíceps", exercises: [ { name: "Puxada Frente Aberta", series: "4", rept: "20/18/15/12", descanso: "60 seg", method: "Pirâmide Crescente" }, { name: "Barra Fixa", series: "4", rept: "Falha", descanso: "60 seg", method: "Rest Pause Última Série" }, { name: "Remada na Máquina Articulada", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Remada Baixa Triângulo", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Drop Set Todas as Séries" }, { name: "Remada Pronada na Máquina", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Convencional" }, { name: "Rosca Direta Barra W", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Rosca Scott na Máquina com Barra W", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Rest Pause Última Série" }, { name: "Rosca Spider com Barra W", series: "3", rept: "15 a 20", descanso: "60 seg", method: "Drop Set Todas as Séries" } ] }, "D": { name: "Treino D - Peito e Tríceps", exercises: [ { name: "Supino Inclinado Máquina", series: "4", rept: "20/18/15/12", descanso: "60 seg", method: "Pirâmide Crescente" }, { name: "Crucifixo Inclinado", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Convencional" }, { name: "Supino Reto Máquina", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Crucifixo Máquina Reto", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Drop Set 1 descida" }, { name: "Tríceps Francês Corda", series: "3", rept: "8 a 12", descanso: "60 seg", method: "Convencional" }, { name: "Tríceps Paralela", series: "4", rept: "8 a 12", descanso: "60 seg", method: "Rest Pause Última Série" }, { name: "Tríceps Corda", series: "4", rept: "15 a 20", descanso: "60 seg", method: "Drop Set Todas as Séries" } ] }, "E": { name: "Treino E - Posterior e Glúteo", exercises: [ { name: "Mesa Flexora", series: "4", rept: "8 a 12", descanso: "90 seg", method: "Rest Pause Última Série" }, { name: "Cadeira Flexora", series: "4", rept: "12 a 15", descanso: "90 seg", method: "Drop Set Todas as Séries" }, { name: "Stiff", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Cadeira Abdutora", series: "4", rept: "15 a 20", descanso: "90 seg", method: "Rest Pause Última Série" }, { name: "Elevação Pélvica com Barra", series: "4", rept: "20/18/15/12", descanso: "90 seg", method: "Pirâmide Crescente" }, { name: "Panturrilha em Pé Máquina", series: "5", rept: "15 a 20", descanso: "90 seg", method: "Convencional" } ] } } },
             "phase4": { title: "Fase 4: Método MAIS CINCO", weeks: [11, 12], schedule: { "Seg": "A", "Ter": "B", "Qua": "C", "Qui": "OFF", "Sex": "D", "Sáb": "E", "Dom": "OFF" }, workouts: { "A": { name: "Treino A - Ombros", exercises: [ { name: "Desenvolvimento Máquina", series: "4", rept: "20/18/15/12", descanso: "90 Seg", method: "Pirâmide + MAIS CINCO" }, { name: "Elevação Lateral Polia", series: "4", rept: "8 a 12", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Elevação Lateral com Halter", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Elevação Frontal na Polia", series: "4", rept: "8 a 12", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Elevação Frontal Barra", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Crucifixo Inverso Máquina", series: "4", rept: "8 a 12", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Pull Face", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" } ] }, "B": { name: "Treino B - Quadríceps", exercises: [ { name: "Cadeira Extensora", series: "4", rept: "15 a 20", descanso: "2 Min", method: "MAIS CINCO" }, { name: "Leg Press 45", series: "4", rept: "20/18/15/12", descanso: "2 Min", method: "Pirâmide + MAIS CINCO" }, { name: "Agachamento Hack", series: "4", rept: "20/18/15/12", descanso: "2 Min", method: "Pirâmide + MAIS CINCO" }, { name: "Agachamento Smith", series: "4", rept: "20/18/15/12", descanso: "2 Min", method: "Pirâmide + MAIS CINCO" }, { name: "Cadeira Adutora", series: "4", rept: "15 a 20", descanso: "2 Min", method: "MAIS CINCO" }, { name: "Cadeira Extensora", series: "4", rept: "15 a 20", descanso: "2 Min", method: "MAIS CINCO" }, { name: "Panturrilha em Pé Máquina", series: "6", rept: "15 a 20", descanso: "45 seg", method: "MAIS CINCO" } ] }, "C": { name: "Treino C - Costas e Bíceps", exercises: [ { name: "Puxada Frente Aberta", series: "4", rept: "20/18/15/12", descanso: "90 Seg", method: "Pirâmide + MAIS CINCO" }, { name: "Barra Fixa", series: "4", rept: "Falha", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Remada na Máquina Articulada", series: "4", rept: "8 a 12", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Remada Baixa Triângulo", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Remada Pronada na Máquina", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Rosca Direta Barra W", series: "4", rept: "8 a 12", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Rosca Scott na Máquina com Barra W", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Rosca Spider com Barra W", series: "3", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" } ] }, "D": { name: "Treino D - Peito e Tríceps", exercises: [ { name: "Supino Inclinado Máquina", series: "4", rept: "20/18/15/12", descanso: "90 Seg", method: "Pirâmide + MAIS CINCO" }, { name: "Crucifixo Inclinado", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Supino Reto Máquina", series: "4", rept: "8 a 12", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Crucifixo Máquina Reto", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Tríceps Francês Corda", series: "3", rept: "8 a 12", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Tríceps Paralela", series: "4", rept: "8 a 12", descanso: "90 Seg", method: "MAIS CINCO" }, { name: "Tríceps Corda", series: "4", rept: "15 a 20", descanso: "90 Seg", method: "MAIS CINCO" } ] }, "E": { name: "Treino E - Posterior e Glúteo", exercises: [ { name: "Mesa Flexora", series: "4", rept: "8 a 12", descanso: "2 Min", method: "MAIS CINCO" }, { name: "Cadeira Flexora", series: "4", rept: "12 a 15", descanso: "2 Min", method: "MAIS CINCO" }, { name: "Stiff", series: "4", rept: "20/18/15/12", descanso: "2 Min", method: "Pirâmide + MAIS CINCO" }, { name: "Cadeira Abdutora", series: "4", rept: "15 a 20", descanso: "2 Min", method: "MAIS CINCO" }, { name: "Elevação Pélvica com Barra", series: "4", rept: "20/18/15/12", descanso: "2 Min", method: "Pirâmide + MAIS CINCO" }, { name: "Panturrilha em Pé Máquina", series: "5", rept: "15 a 20", descanso: "2 Min", method: "MAIS CINCO" } ] } } }
         };
 
-        const appState = {
+        /**
+         * Gerenciamento do Estado da Aplicação
+         * Estado centralizado para a aplicação de treinos
+         */
+        const APP_STATE = {
             currentWeekNumber: 1,
             currentDay: 'Seg',
             highestUnlockedWeek: 1,
@@ -325,7 +441,11 @@
             allCompletions: {}
         };
 
-        const dom = {
+        /**
+         * Referências dos Elementos DOM
+         * Elementos DOM cacheados para melhor performance
+         */
+        const DOM_ELEMENTS = {
             mainContent: document.getElementById('main-content'),
             stepperNav: document.getElementById('stepper-nav'),
             daySelector: document.getElementById('day-selector'),
@@ -342,13 +462,23 @@
             saveEditBtn: document.getElementById('save-edit-btn'),
         };
         
+        /**
+         * Configuração do Confete
+         * Configuração para animações de celebração
+         */
         const confettiCanvas = document.getElementById('confetti-canvas');
-        const myConfetti = confetti.create(confettiCanvas, {
+        const confettiInstance = confetti.create(confettiCanvas, {
             resize: true,
             useWorker: true
         });
 
-        // --- Funções Utilitárias ---
+        // ==========================================
+        // FUNÇÕES UTILITÁRIAS
+        // ==========================================
+        
+        /**
+         * Exibir mensagem de conclusão quando o programa terminar
+         */
         function showCompletionMessage() {
             const modal = document.createElement('div');
             modal.className = 'fixed inset-0 bg-black/70 flex items-center justify-center z-[200] p-4';
@@ -364,9 +494,9 @@
             // Confetes contínuos
             let confettiInterval;
             
-            // Função para disparar confetes
+            // Inicia celebração contínua de confete
             const fireConfetti = () => {
-                myConfetti({
+                confettiInstance({
                     particleCount: 150,
                     spread: 90,
                     origin: { y: 0.6 },
@@ -374,65 +504,74 @@
                 });
             };
             
-            // Dispara confetes na hora
             fireConfetti();
-
-            // Continua disparando confetes a cada 3 segundos
             confettiInterval = setInterval(fireConfetti, 3000);
             
             document.getElementById('close-modal-btn').addEventListener('click', () => {
-                clearInterval(confettiInterval); // Para a chuva de confetes
+                clearInterval(confettiInterval);
                 modal.remove();
             });
         }
         
-        function resetState() {
+        /**
+         * Resetar o estado da aplicação para os valores iniciais
+         */
+        function resetApplicationState() {
             localStorage.removeItem('workoutProgress');
-            localStorage.removeItem('customSchedules'); // Limpa também os agendamentos customizados
-            appState.currentWeekNumber = 1;
-            appState.currentDay = 'Seg';
-            appState.highestUnlockedWeek = 1;
-            appState.highestUnlockedDayIndex = 0;
-            appState.completionStatus = {};
-            appState.allCompletions = {};
-            console.warn("Estado foi resetado devido a dados salvos inválidos.");
-            // Recarrega os dados originais se a função for chamada
-            Object.assign(workoutPhases, JSON.parse(JSON.stringify(originalWorkoutPhases)));
+            localStorage.removeItem('customSchedules');
+            APP_STATE.currentWeekNumber = 1;
+            APP_STATE.currentDay = 'Seg';
+            APP_STATE.highestUnlockedWeek = 1;
+            APP_STATE.highestUnlockedDayIndex = 0;
+            APP_STATE.completionStatus = {};
+            APP_STATE.allCompletions = {};
+            console.warn("Application state was reset due to invalid saved data.");
+            // Recarrega dados originais se a função for chamada
+            Object.assign(WORKOUT_PHASES, JSON.parse(JSON.stringify(originalWorkoutPhases)));
         }
 
-        // --- Gerenciamento de Estado ---
-        function saveState() {
+        // ==========================================
+        // GERENCIAMENTO DE ESTADO
+        // ==========================================
+        
+        /**
+         * Salvar o estado atual da aplicação no localStorage
+         */
+        function saveApplicationState() {
             localStorage.setItem('workoutProgress', JSON.stringify({
-                highestUnlockedWeek: appState.highestUnlockedWeek,
-                highestUnlockedDayIndex: appState.highestUnlockedDayIndex,
-                allCompletions: appState.allCompletions
+                highestUnlockedWeek: APP_STATE.highestUnlockedWeek,
+                highestUnlockedDayIndex: APP_STATE.highestUnlockedDayIndex,
+                allCompletions: APP_STATE.allCompletions
             }));
             
-            // Salva apenas os agendamentos modificados
+            // Salva apenas os horários modificados
             const customSchedules = {};
-            for (const phaseKey in workoutPhases) {
-                customSchedules[phaseKey] = workoutPhases[phaseKey].schedule;
+            for (const phaseKey in WORKOUT_PHASES) {
+                customSchedules[phaseKey] = WORKOUT_PHASES[phaseKey].schedule;
             }
             localStorage.setItem('customSchedules', JSON.stringify(customSchedules));
         }
 
-        function loadState() {
-            // Carrega agendamentos customizados
+        /**
+         * Carregar o estado da aplicação do localStorage
+         */
+        function loadApplicationState() {
+            // Carrega horários personalizados
             const savedSchedulesJSON = localStorage.getItem('customSchedules');
             if (savedSchedulesJSON) {
                 try {
                     const savedSchedules = JSON.parse(savedSchedulesJSON);
                     for (const phaseKey in savedSchedules) {
-                        if (workoutPhases[phaseKey]) {
-                            workoutPhases[phaseKey].schedule = savedSchedules[phaseKey];
+                        if (WORKOUT_PHASES[phaseKey]) {
+                            WORKOUT_PHASES[phaseKey].schedule = savedSchedules[phaseKey];
                         }
                     }
                 } catch (e) {
-                    console.error("Erro ao carregar agendamentos customizados. Usando padrão.", e);
+                    console.error("Error loading custom schedules. Using defaults.", e);
                 }
             }
 
-            // Carrega progresso
+            // Carrega dados de progresso
             try {
                 const savedStateJSON = localStorage.getItem('workoutProgress');
                 if (!savedStateJSON) return;
@@ -442,17 +581,17 @@
                 if (typeof savedState !== 'object' || savedState === null ||
                     typeof savedState.highestUnlockedWeek !== 'number' ||
                     typeof savedState.highestUnlockedDayIndex !== 'number') {
-                    throw new Error("Estrutura de estado inválida.");
+                    throw new Error("Invalid state structure.");
                 }
                 
                 let week = savedState.highestUnlockedWeek;
                 if (week < 1 || week > 12) {
-                     throw new Error("Número da semana inválido.");
+                     throw new Error("Invalid week number.");
                 }
 
                 const phaseData = getPhaseDataByWeek(week);
                 if (!phaseData) {
-                    throw new Error(`Dados da fase não encontrados para a semana ${week}.`);
+                    throw new Error(`Phase data not found for week ${week}.`);
                 }
 
                 const dayKeys = Object.keys(phaseData.schedule);
@@ -461,22 +600,27 @@
                     dayIndex = 0;
                 }
                 
-                appState.highestUnlockedWeek = week;
-                appState.currentWeekNumber = week;
-                appState.highestUnlockedDayIndex = dayIndex;
-                appState.currentDay = dayKeys[dayIndex];
-                appState.allCompletions = savedState.allCompletions || {};
+                APP_STATE.highestUnlockedWeek = week;
+                APP_STATE.currentWeekNumber = week;
+                APP_STATE.highestUnlockedDayIndex = dayIndex;
+                APP_STATE.currentDay = dayKeys[dayIndex];
+                APP_STATE.allCompletions = savedState.allCompletions || {};
                 loadCurrentCompletionStatus();
 
             } catch (error) {
-                console.error("Falha ao carregar ou validar estado do localStorage. Resetando.", error);
-                resetState();
+                console.error("Failed to load or validate state from localStorage. Resetting.", error);
+                resetApplicationState();
             }
         }
         
+        /**
+         * Obter dados da fase para um número específico de semana
+         * @param {number} weekNumber - O número da semana para obter dados da fase
+         * @returns {Object|null} Objeto de dados da fase ou null se não encontrado
+         */
         function getPhaseDataByWeek(weekNumber) {
-            for (const phaseKey in workoutPhases) {
-                const phase = workoutPhases[phaseKey];
+            for (const phaseKey in WORKOUT_PHASES) {
+                const phase = WORKOUT_PHASES[phaseKey];
                 if (phase.weeks.includes(weekNumber)) {
                     return phase;
                 }
@@ -484,23 +628,37 @@
             return null;
         }
         
+        /**
+         * Obter chave da fase para um número específico de semana
+         * @param {number} weekNumber - O número da semana para obter a chave da fase
+         * @returns {string|null} Chave da fase ou null se não encontrada
+         */
         function getPhaseKeyByWeek(weekNumber) {
-            for (const phaseKey in workoutPhases) {
-                if (workoutPhases[phaseKey].weeks.includes(weekNumber)) {
+            for (const phaseKey in WORKOUT_PHASES) {
+                if (WORKOUT_PHASES[phaseKey].weeks.includes(weekNumber)) {
                     return phaseKey;
                 }
             }
             return null;
         }
 
+        /**
+         * Carregar status de conclusão para a semana e dia atuais
+         */
         function loadCurrentCompletionStatus() {
-            const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
-            appState.completionStatus = appState.allCompletions[key] || {};
+            const key = `week${APP_STATE.currentWeekNumber}-${APP_STATE.currentDay}`;
+            APP_STATE.completionStatus = APP_STATE.allCompletions[key] || {};
         }
 
-        // --- Funções de Renderização ---
-        function renderStepperNav() {
-            dom.stepperNav.innerHTML = '';
+        // ==========================================
+        // FUNÇÕES DE RENDERIZAÇÃO
+        // ==========================================
+        
+        /**
+         * Renderizar o navegador de navegação por semanas
+         */
+        function renderStepperNavigation() {
+            DOM_ELEMENTS.stepperNav.innerHTML = '';
             const container = document.createElement('div');
             container.className = 'relative w-full px-1 md:px-2';
 
@@ -509,7 +667,8 @@
             container.appendChild(track);
 
             const progressFill = document.createElement('div');
-            const progressPercentage = appState.highestUnlockedWeek > 1 ? ((appState.highestUnlockedWeek - 1) / 11) * 100 : 0;
+            const progressPercentage = APP_STATE.highestUnlockedWeek > 1 ? 
+                ((APP_STATE.highestUnlockedWeek - 1) / 11) * 100 : 0;
             progressFill.className = 'absolute top-1/2 -translate-y-1/2 left-0 h-1 bg-orange-500 rounded-full transition-all duration-500';
             progressFill.style.width = `${progressPercentage}%`;
             container.appendChild(progressFill);
@@ -519,25 +678,27 @@
             
             for (let i = 1; i <= 12; i++) {
                 const weekNumber = i;
-                const isLocked = weekNumber > appState.highestUnlockedWeek;
+                const isLocked = weekNumber > APP_STATE.highestUnlockedWeek;
                 
                 const markerWrapper = document.createElement('div');
                 markerWrapper.className = `group relative flex flex-col items-center p-0.5 md:p-2 ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`;
                 
                 if (!isLocked) {
                     markerWrapper.addEventListener('click', () => {
-                        appState.currentWeekNumber = weekNumber;
+                        APP_STATE.currentWeekNumber = weekNumber;
                         const newPhaseData = getPhaseDataByWeek(weekNumber);
                         const dayKeys = Object.keys(newPhaseData.schedule);
-                        appState.currentDay = weekNumber === appState.highestUnlockedWeek ? dayKeys[appState.highestUnlockedDayIndex] : dayKeys[0];
+                        APP_STATE.currentDay = weekNumber === APP_STATE.highestUnlockedWeek ? 
+                            dayKeys[APP_STATE.highestUnlockedDayIndex] : dayKeys[0];
                         loadCurrentCompletionStatus();
-                        renderAll();
+                        renderAllComponents();
                     });
                 }
 
                 const marker = document.createElement('div');
                 let markerClasses = 'w-1.5 h-1.5 md:w-3 md:h-3 rounded-full transition-all duration-300 flex items-center justify-center';
-                if (weekNumber === appState.currentWeekNumber) {
+                
+                if (weekNumber === APP_STATE.currentWeekNumber) {
                     if (weekNumber === 12) {
                         markerClasses += ' bg-white border-2 border-yellow-500 scale-150 ring-2 ring-yellow-300';
                         marker.innerHTML = `<i class='ph-fill ph-trophy text-yellow-500 text-xs md:text-sm'></i>`;
@@ -545,11 +706,12 @@
                     } else {
                         markerClasses += ' bg-orange-500 border-2 border-orange-400 scale-150 current-week-marker-animation';
                     }
-                } else if (weekNumber < appState.highestUnlockedWeek) {
+                } else if (weekNumber < APP_STATE.highestUnlockedWeek) {
                     markerClasses += ' bg-gray-800 border-2 border-orange-500';
                 } else {
                     markerClasses += isLocked ? ' bg-gray-800 border-2 border-gray-600' : ' bg-gray-600';
                 }
+                
                 if(isLocked) {
                     if(weekNumber === 12) {
                         marker.innerHTML = `<i class='ph-fill ph-trophy text-yellow-500 text-xs md:text-sm'></i>`;
@@ -561,7 +723,7 @@
                 marker.className = markerClasses;
                 
                 const tooltip = document.createElement('span');
-                tooltip.className = 'step-tooltip absolute bottom-full mb-2 px-2 py-1 text-xs font-semibold text-white bg-gray-700 rounded-md shadow-lg whitespace-nowrap';
+                tooltip.className = 'step-tooltip absolute bottom-full mb-2 px-2 py-1 text-xs font-semibold text-white bg-gray-700 rounded-md whitespace-nowrap';
                 tooltip.textContent = `Semana ${weekNumber}`;
                 
                 markerWrapper.appendChild(tooltip);
@@ -570,34 +732,41 @@
             }
             
             container.appendChild(markersContainer);
-            dom.stepperNav.appendChild(container);
+            DOM_ELEMENTS.stepperNav.appendChild(container);
         }
 
+        /**
+         * Renderizar o cabeçalho da fase com título e informações da semana
+         */
         function renderPhaseHeader() {
-            const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             if (!phaseData) return;
-            dom.phaseHeader.innerHTML = `
+            
+            DOM_ELEMENTS.phaseHeader.innerHTML = `
                 <h2 class="text-3xl md:text-4xl font-black text-orange-400 tracking-tight">${phaseData.title}</h2>
-                <p class="text-lg text-gray-400 font-semibold mt-1">Semana ${appState.currentWeekNumber} de 12</p>
+                <p class="text-lg text-gray-400 font-semibold mt-1">Semana ${APP_STATE.currentWeekNumber} de 12</p>
             `;
         }
 
+        /**
+         * Renderizar o seletor de dias com os dias de treino
+         */
         function renderDaySelector() {
-            const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             const dayKeys = Object.keys(phaseData.schedule);
-            dom.daySelector.innerHTML = '';
+            DOM_ELEMENTS.daySelector.innerHTML = '';
 
             dayKeys.forEach((day, index) => {
-                const isLocked = appState.currentWeekNumber === appState.highestUnlockedWeek && index > appState.highestUnlockedDayIndex;
+                const isInUnlockedWeek = APP_STATE.currentWeekNumber <= APP_STATE.highestUnlockedWeek;
                 const workoutLetter = phaseData.schedule[day];
                 const button = document.createElement('button');
                 button.textContent = day;
                 let buttonClasses = `px-2 md:px-3 py-1.5 text-xs md:text-sm rounded-md font-semibold transition-colors duration-200 flex-1 text-center min-w-0 `;
 
-                if (isLocked || workoutLetter === 'OFF') {
+                if (!isInUnlockedWeek || workoutLetter === 'OFF') {
                     buttonClasses += 'bg-gray-800 text-gray-500 cursor-not-allowed';
                     button.disabled = true;
-                } else if (appState.currentDay === day) {
+                } else if (APP_STATE.currentDay === day) {
                     buttonClasses += 'bg-orange-600 text-white';
                 } else {
                     buttonClasses += 'bg-gray-700 text-gray-400 hover:bg-gray-600';
@@ -605,67 +774,101 @@
 
                 button.className = buttonClasses;
 
-                if (!isLocked && workoutLetter !== 'OFF') {
+                if (isInUnlockedWeek && workoutLetter !== 'OFF') {
                     button.addEventListener('click', () => {
-                        appState.currentDay = day;
+                        APP_STATE.currentDay = day;
                         loadCurrentCompletionStatus();
-                        renderWorkout();
+                        renderWorkoutDetails();
                         renderDaySelector();
                     });
                 }
-                dom.daySelector.appendChild(button);
+                DOM_ELEMENTS.daySelector.appendChild(button);
             });
 
-            // Adiciona o botão de editar
+            // Adiciona botão de edição
             const editButton = document.createElement('button');
             editButton.id = 'edit-schedule-btn';
             editButton.className = `flex-shrink-0 flex items-center justify-center p-1 rounded-md text-gray-400 hover:bg-gray-600 hover:text-orange-400 transition-colors duration-200`;
             editButton.innerHTML = `<i class="ph-bold ph-pencil-simple text-base"></i>`;
             editButton.title = 'Editar treinos da semana';
             editButton.addEventListener('click', openEditModal);
-            dom.daySelector.appendChild(editButton);
+            DOM_ELEMENTS.daySelector.appendChild(editButton);
         }
 
-        function renderWorkout() {
-            const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
+        /**
+         * Renderizar detalhes do treino e lista de exercícios
+         */
+        function renderWorkoutDetails() {
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             if (!phaseData) return; 
-            const workoutLetter = phaseData.schedule[appState.currentDay];
-            dom.workoutDetails.innerHTML = '';
-            dom.workoutTitle.innerHTML = '';
-            dom.progressBarContainer.innerHTML = '';
-            dom.footer.style.display = 'none';
+            
+            const workoutLetter = phaseData.schedule[APP_STATE.currentDay];
+            DOM_ELEMENTS.workoutDetails.innerHTML = '';
+            DOM_ELEMENTS.workoutTitle.innerHTML = '';
+            DOM_ELEMENTS.progressBarContainer.innerHTML = '';
+            DOM_ELEMENTS.footer.style.display = 'none';
 
+            // Gerenciar dia de descanso
             if (workoutLetter === 'OFF' || !phaseData.workouts[workoutLetter]) {
-                dom.workoutTitle.innerHTML = `<h2 class="text-2xl font-bold text-gray-400">Dia de Descanso</h2>`;
+                DOM_ELEMENTS.workoutTitle.innerHTML = `<h2 class="text-2xl font-bold text-gray-400">Dia de Descanso</h2>`;
                 return;
             }
             
-            dom.footer.style.display = 'block';
+            DOM_ELEMENTS.footer.style.display = 'block';
 
             const workout = phaseData.workouts[workoutLetter];
-            dom.workoutTitle.innerHTML = `<h2 class="text-3xl font-bold text-white">${workout.name}</h2>`;
+            DOM_ELEMENTS.workoutTitle.innerHTML = `<h2 class="text-3xl font-bold text-white">${workout.name}</h2>`;
             
+            // Calcular progresso
             const totalExercises = workout.exercises.length;
-            const completedExercises = Object.values(appState.completionStatus).filter(Boolean).length;
+            const completedExercises = Object.values(APP_STATE.completionStatus).filter(Boolean).length;
             const progress = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0;
             const allDone = completedExercises >= totalExercises;
             
-            const isCurrentProgressDay = appState.currentWeekNumber === appState.highestUnlockedWeek &&
-                               Object.keys(phaseData.schedule).indexOf(appState.currentDay) === appState.highestUnlockedDayIndex;
+            const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
+                               Object.keys(phaseData.schedule).indexOf(APP_STATE.currentDay) === APP_STATE.highestUnlockedDayIndex;
 
-            dom.completeWorkoutBtn.disabled = !isCurrentProgressDay;
+            DOM_ELEMENTS.completeWorkoutBtn.disabled = !isCurrentProgressDay;
 
+            // Atualizar aparência do botão baseado no status de conclusão
+            updateWorkoutButton(allDone);
+
+            // Renderizar barra de progresso
+            renderProgressBar(completedExercises, totalExercises, progress);
+
+            // Renderizar exercícios com otimização de performance
+            const fragment = document.createDocumentFragment();
+            workout.exercises.forEach((exercise, index) => {
+                const exerciseCard = createExerciseCard(exercise, index);
+                fragment.appendChild(exerciseCard);
+            });
+            DOM_ELEMENTS.workoutDetails.appendChild(fragment);
+        }
+
+        /**
+         * Atualizar aparência do botão de conclusão do treino
+         * @param {boolean} allDone - Se todos os exercícios estão concluídos
+         */
+        function updateWorkoutButton(allDone) {
             if (allDone) {
-                dom.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
-                dom.completeWorkoutBtn.classList.add('bg-green-600/80', 'hover:bg-green-500');
-                dom.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-arrow-right text-2xl'></i> Avançar Treino`;
+                DOM_ELEMENTS.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
+                DOM_ELEMENTS.completeWorkoutBtn.classList.add('bg-green-600/80', 'hover:bg-green-500');
+                DOM_ELEMENTS.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-arrow-right text-2xl' aria-hidden="true"></i> Avançar Treino`;
             } else {
-                dom.completeWorkoutBtn.classList.remove('bg-green-600/80', 'hover:bg-green-500');
-                dom.completeWorkoutBtn.classList.add('bg-gray-600/80', 'hover:bg-gray-500');
-                dom.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-checks text-2xl'></i> Concluir Treino`;
+                DOM_ELEMENTS.completeWorkoutBtn.classList.remove('bg-green-600/80', 'hover:bg-green-500');
+                DOM_ELEMENTS.completeWorkoutBtn.classList.add('bg-gray-600/80', 'hover:bg-gray-500');
+                DOM_ELEMENTS.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-checks text-2xl' aria-hidden="true"></i> Concluir Treino`;
             }
+        }
 
-            dom.progressBarContainer.innerHTML = `
+        /**
+         * Renderizar barra de progresso
+         * @param {number} completedExercises - Número de exercícios concluídos
+         * @param {number} totalExercises - Número total de exercícios
+         * @param {number} progress - Porcentagem de progresso
+         */
+        function renderProgressBar(completedExercises, totalExercises, progress) {
+            DOM_ELEMENTS.progressBarContainer.innerHTML = `
                 <div class="flex justify-between items-center mb-1 text-sm font-semibold">
                     <span class="text-gray-400">Progresso do Treino</span>
                     <span class="text-white">${completedExercises} / ${totalExercises}</span>
@@ -674,191 +877,191 @@
                     <div class="bg-orange-500 h-2.5 rounded-full transition-all duration-500 progress-bar-striped" style="width: ${progress}%"></div>
                 </div>
             `;
+        }
 
-            workout.exercises.forEach((exercise, index) => {
-                const isCompleted = appState.completionStatus[index];
-                const card = document.createElement('div');
-                card.className = `bg-gray-800 rounded-xl shadow-lg border border-gray-700 transition-all duration-300 flex flex-col ${isCompleted ? 'exercise-completed' : ''}`;
-                
-                let imageUrl;
-                if (exercise.name === 'Elevação Lateral na Polia') {
-                    imageUrl = 'imagens/Elevação Lateral na Polia.gif';
-                } else if (exercise.name === 'Pulley Frente Aberto') {
-                    imageUrl = 'imagens/Pulley Frente Aberto.gif';
-                } else if (exercise.name === 'Puxada Triângulo') {
-                    imageUrl = 'imagens/Puxada Triângulo.gif';
-                } else if (exercise.name === 'Remada Serrote') {
-                    imageUrl = 'imagens/Remada Serrote.gif';
-                } else if (exercise.name === 'Remada Baixa Triângulo') {
-                    imageUrl = 'imagens/Remada Baixa Triângulo.gif';
-                } else if (exercise.name === 'Rosca Direta Barra Reta') {
-                    imageUrl = 'imagens/Rosca Direta Barra Reta.gif';
-                } else if (exercise.name === 'Tríceps Corda') {
-                    imageUrl = 'imagens/Tríceps Corda.gif';
-                } else if (exercise.name === 'Rosca Martelo + Tríceps Francês (Corda)') {
-                    imageUrl = 'imagens/Rosca Martelo + Tríceps Francês (Corda).gif';
-                } else if (exercise.name === 'Desenvolvimento Máquina') {
-                    imageUrl = 'imagens/Desenvolvimento Máquina.gif';
-                } else if (exercise.name === 'Cadeira Extensora') {
-                    imageUrl = 'imagens/Cadeira Extensora.gif';
-                } else if (exercise.name === 'Leg Press 45') {
-                    imageUrl = 'imagens/Leg Press 45.gif';
-                } else if (exercise.name === 'Cadeira Adutora') {
-                    imageUrl = 'imagens/Cadeira Adutora.gif';
-                } else if (exercise.name === 'Cadeira Extensora (2)') {
-                    imageUrl = 'imagens/Cadeira Extensora (2).gif';
-                } else if (exercise.name === 'Cadeira Flexora') {
-                    imageUrl = 'imagens/Cadeira Flexora.gif';
-                } else if (exercise.name === 'Cadeira Abdutora') {
-                    imageUrl = 'imagens/Cadeira Abdutora.gif';
-                } else if (exercise.name === 'Supino Inclinado Máquina') {
-                    imageUrl = 'imagens/Supino Inclinado Máquina.gif';
-                } else if (exercise.name === 'Crucifixo Inclinado') {
-                    imageUrl = 'imagens/Crucifixo Inclinado.gif';
-                } else if (exercise.name === 'Supino Reto Máquina') {
-                    imageUrl = 'imagens/Supino Reto Máquina.gif';
-                } else if (exercise.name === 'Desenvolvimento Máquina Aberto') {
-                    imageUrl = 'imagens/Desenvolvimento Máquina Aberto.gif';
-                } else if (exercise.name === 'Elevação Lateral') {
-                    imageUrl = 'imagens/Elevação Lateral.gif';
-                } else if (exercise.name === 'Tríceps Paralela') {
-                    imageUrl = 'imagens/Tríceps Paralela.gif';
-                } else if (exercise.name === 'Elevação Lateral com Halter') {
-                    imageUrl = 'imagens/Elevação Lateral com Halter.gif';
-                } else if (exercise.name === 'Elevação Frontal na Polia') {
-                    imageUrl = 'imagens/Elevação Frontal na Polia.gif';
-                } else if (exercise.name === 'Elevação Frontal Barra') {
-                    imageUrl = 'imagens/Elevação Frontal Barra.gif';
-                } else if (exercise.name === 'Crucifixo Inverso Máquina') { 
-                    imageUrl = 'imagens/Crucifixo Inverso Máquina.gif';
-                } else if (exercise.name === 'Pull Face') {
-                    imageUrl = 'imagens/Pull Face.gif';
-                } else if (exercise.name === 'Puxada Frente Aberta') {
-                    imageUrl = 'imagens/Puxada Frente Aberta.gif';
-                } else if (exercise.name === 'Barra Fixa') {
-                    imageUrl = 'imagens/Barra Fixa.gif';
-                } else if (exercise.name === 'Remada na Máquina Articulada') {
-                    imageUrl = 'imagens/Remada na Máquina Articulada.gif';
-                } else if (exercise.name === 'Remada Pronada na Máquina') {
-                    imageUrl = 'imagens/Remada Pronada na Máquina.gif';
-                } else if (exercise.name === 'Rosca Direta Barra W') {
-                    imageUrl = 'imagens/Rosca Direta Barra W.gif';
-                } else if (exercise.name === 'Rosca Scott na Máquina com Barra W') {
-                    imageUrl = 'imagens/Rosca Scott na Máquina com Barra W.gif';
-                } else if (exercise.name === 'Rosca Spider com Barra W') {
-                    imageUrl = 'imagens/Rosca Spider com Barra W.gif';
-                } else if (exercise.name === 'Tríceps Francês Corda') {
-                    imageUrl = 'imagens/Tríceps Francês Corda.gif';
-                } else if (exercise.name === 'Mesa Flexora') {
-                    imageUrl = 'imagens/Mesa Flexora.gif';
-                } else if (exercise.name === 'Stiff') {
-                    imageUrl = 'imagens/Stiff.gif';
-                } else if (exercise.name === 'Elevação Pélvica com Barra') {
-                    imageUrl = 'imagens/Elevação Pélvica com Barra.gif';
-                } else if (exercise.name === 'Panturrilha em Pé Máquina') {
-                    imageUrl = 'imagens/Panturrilha em Pé Máquina.gif';
-                } else if (exercise.name === 'Agachamento Hack') {
-                    imageUrl = 'imagens/Agachamento Hack.gif';
-                } else if (exercise.name === 'Crucifixo Máquina Reto') {
-                    imageUrl = 'imagens/Crucifixo Máquina Reto.gif';
-                } else if (exercise.name === 'Agachamento Smith') {
-                    imageUrl = 'imagens/Agachamento Smith.gif';
-                } else if (exercise.name === 'Elevação Lateral Polia') {
-                    imageUrl = 'imagens/Elevação Lateral Polia.gif';
-                } else {
-                    imageUrl = `https://placehold.co/100x100/1f2937/FFFFFF?text=${encodeURIComponent(exercise.name.split(' ')[0])}&font=inter`;
-                }
+        /**
+         * Criar um elemento de cartão de exercício
+         * @param {Object} exercise - Dados do exercício
+         * @param {number} index - Índice do exercício
+         * @returns {HTMLElement} Elemento do cartão de exercício
+         */
+        function createExerciseCard(exercise, index) {
+            const isCompleted = APP_STATE.completionStatus[index];
+            const card = document.createElement('div');
+            card.className = `bg-gray-800 rounded-xl shadow-lg border border-gray-700 transition-all duration-300 flex flex-col ${isCompleted ? 'exercise-completed' : ''}`;
+            
+            const imageUrl = getExerciseImageUrl(exercise.name);
 
-                card.innerHTML = `
-                    <div class="flex-grow p-5">
-                        <div class="flex flex-col items-center w-full">
-                            <img src="${imageUrl}" alt="Ilustração do exercício" class="w-64 h-64 md:w-72 md:h-72 object-cover rounded-xl mb-6 shadow-xl border-4 border-orange-500/20">
-                            <h3 class="text-2xl font-bold text-white text-center mb-6">${exercise.name}</h3>
+            card.innerHTML = `
+                <div class="flex-grow p-5">
+                    <div class="flex flex-col items-center w-full">
+                        <img src="${imageUrl}" 
+                             alt="Ilustração do exercício ${exercise.name}" 
+                             class="w-64 h-64 md:w-72 md:h-72 object-cover rounded-xl mb-6 shadow-xl border-4 border-orange-500/20"
+                             loading="lazy">
+                        <h3 class="text-2xl font-bold text-white text-center mb-6">${exercise.name}</h3>
 
-                            <div class="w-full grid grid-cols-2 gap-3 text-center">
-                                <div class="bg-gray-900/50 p-3 rounded-lg">
-                                    <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider">Séries</span>
-                                    <p class="font-bold text-lg text-white">${exercise.series}</p>
-                                </div>
-                                <div class="bg-gray-900/50 p-3 rounded-lg">
-                                    <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider">Reps</span>
-                                    <p class="font-bold text-lg text-white">${exercise.rept}</p>
-                                </div>
-                                <div class="bg-gray-900/50 p-3 rounded-lg">
-                                    <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider">Descanso</span>
-                                    <p class="font-bold text-lg text-white">${exercise.descanso}</p>
-                                </div>
-                                <div class="bg-orange-600/20 text-orange-400 p-3 rounded-lg border border-orange-500/30">
-                                    <span class="text-xs uppercase font-semibold tracking-wider">Método</span>
-                                    <p class="font-bold text-lg">${exercise.method}</p>
-                                </div>
+                        <div class="w-full grid grid-cols-2 gap-3 text-center">
+                            <div class="bg-gray-900/50 p-3 rounded-lg">
+                                <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider">Séries</span>
+                                <p class="font-bold text-lg text-white">${exercise.series}</p>
+                            </div>
+                            <div class="bg-gray-900/50 p-3 rounded-lg">
+                                <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider">Reps</span>
+                                <p class="font-bold text-lg text-white">${exercise.rept}</p>
+                            </div>
+                            <div class="bg-gray-900/50 p-3 rounded-lg">
+                                <span class="text-xs uppercase text-gray-400 font-semibold tracking-wider">Descanso</span>
+                                <p class="font-bold text-lg text-white">${exercise.descanso}</p>
+                            </div>
+                            <div class="bg-orange-600/20 text-orange-400 p-3 rounded-lg border border-orange-500/30">
+                                <span class="text-xs uppercase font-semibold tracking-wider">Método</span>
+                                <p class="font-bold text-lg">${exercise.method}</p>
                             </div>
                         </div>
                     </div>
-                    <div class="completion-toggle-wrapper p-4 bg-gray-900/50 rounded-b-xl mt-auto flex items-center justify-center cursor-pointer transition-colors duration-300 hover:bg-gray-700/50" data-index="${index}">
-                        <div class="animated-check-container ${isCompleted ? 'completed' : ''}">
-                            <svg class="animated-check-svg" viewBox="0 0 24 24">
-                                <circle class="animated-check-circle" cx="12" cy="12" r="10"/>
-                                <path class="animated-check-path" d="M7 13l3 3 7-7"/>
-                            </svg>
-                        </div>
-                        <span class="ml-3 font-bold text-lg transition-colors duration-300 ${isCompleted ? 'text-green-400' : 'text-gray-300'}">${isCompleted ? 'Concluído!' : 'Marcar como Concluído'}</span>
+                </div>
+                <div class="completion-toggle-wrapper p-4 bg-gray-900/50 rounded-b-xl mt-auto flex items-center justify-center cursor-pointer transition-colors duration-300 hover:bg-gray-700/50" data-index="${index}">
+                    <div class="animated-check-container ${isCompleted ? 'completed' : ''}">
+                        <svg class="animated-check-svg" viewBox="0 0 24 24">
+                            <circle class="animated-check-circle" cx="12" cy="12" r="10"/>
+                            <path class="animated-check-path" d="M7 13l3 3 7-7"/>
+                        </svg>
                     </div>
-                `;
+                    <span class="ml-3 font-bold text-lg transition-colors duration-300 ${isCompleted ? 'text-green-400' : 'text-gray-300'}">${isCompleted ? 'Concluído!' : 'Marcar como Concluído'}</span>
+                </div>
+            `;
+            
+            return card;
+        }
 
-                card.querySelector('.completion-toggle-wrapper').addEventListener('click', () => {
-                    appState.completionStatus[index] = !appState.completionStatus[index];
-                    const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
-                    appState.allCompletions[key] = appState.completionStatus;
-                    saveState();
-                    renderWorkout();
-                });
-                
-                dom.workoutDetails.appendChild(card);
-            });
+        /**
+         * Gerenciar alternância de conclusão de exercício usando delegação de eventos
+         * @param {Event} event - Evento de clique
+         */
+        function handleExerciseToggle(event) {
+            const toggleWrapper = event.target.closest('.completion-toggle-wrapper');
+            if (!toggleWrapper) return;
+            
+            const index = parseInt(toggleWrapper.dataset.index);
+            APP_STATE.completionStatus[index] = !APP_STATE.completionStatus[index];
+            const key = `week${APP_STATE.currentWeekNumber}-${APP_STATE.currentDay}`;
+            APP_STATE.allCompletions[key] = APP_STATE.completionStatus;
+            saveApplicationState();
+            renderWorkoutDetails();
+        }
+
+        /**
+         * Obter URL da imagem para exercício
+         * @param {string} exerciseName - Nome do exercício
+         * @returns {string} URL da imagem
+         */
+        function getExerciseImageUrl(exerciseName) {
+            // Mapeamento de imagens de exercícios
+            const exerciseImageMap = {
+                'Elevação Lateral na Polia': 'imagens/Elevação Lateral na Polia.gif',
+                'Pulley Frente Aberto': 'imagens/Pulley Frente Aberto.gif',
+                'Puxada Triângulo': 'imagens/Puxada Triângulo.gif',
+                'Remada Serrote': 'imagens/Remada Serrote.gif',
+                'Remada Baixa Triângulo': 'imagens/Remada Baixa Triângulo.gif',
+                'Rosca Direta Barra Reta': 'imagens/Rosca Direta Barra Reta.gif',
+                'Tríceps Corda': 'imagens/Tríceps Corda.gif',
+                'Rosca Martelo + Tríceps Francês (Corda)': 'imagens/Rosca Martelo + Tríceps Francês (Corda).gif',
+                'Desenvolvimento Máquina': 'imagens/Desenvolvimento Máquina.gif',
+                'Cadeira Extensora': 'imagens/Cadeira Extensora.gif',
+                'Leg Press 45': 'imagens/Leg Press 45.gif',
+                'Cadeira Adutora': 'imagens/Cadeira Adutora.gif',
+                'Cadeira Extensora (2)': 'imagens/Cadeira Extensora (2).gif',
+                'Cadeira Flexora': 'imagens/Cadeira Flexora.gif',
+                'Cadeira Abdutora': 'imagens/Cadeira Abdutora.gif',
+                'Supino Inclinado Máquina': 'imagens/Supino Inclinado Máquina.gif',
+                'Crucifixo Inclinado': 'imagens/Crucifixo Inclinado.gif',
+                'Supino Reto Máquina': 'imagens/Supino Reto Máquina.gif',
+                'Desenvolvimento Máquina Aberto': 'imagens/Desenvolvimento Máquina Aberto.gif',
+                'Elevação Lateral': 'imagens/Elevação Lateral.gif',
+                'Tríceps Paralela': 'imagens/Tríceps Paralela.gif',
+                'Elevação Lateral com Halter': 'imagens/Elevação Lateral com Halter.gif',
+                'Elevação Frontal na Polia': 'imagens/Elevação Frontal na Polia.gif',
+                'Elevação Frontal Barra': 'imagens/Elevação Frontal Barra.gif',
+                'Crucifixo Inverso Máquina': 'imagens/Crucifixo Inverso Máquina.gif',
+                'Pull Face': 'imagens/Pull Face.gif',
+                'Puxada Frente Aberta': 'imagens/Puxada Frente Aberta.gif',
+                'Barra Fixa': 'imagens/Barra Fixa.gif',
+                'Remada na Máquina Articulada': 'imagens/Remada na Máquina Articulada.gif',
+                'Remada Pronada na Máquina': 'imagens/Remada Pronada na Máquina.gif',
+                'Rosca Direta Barra W': 'imagens/Rosca Direta Barra W.gif',
+                'Rosca Scott na Máquina com Barra W': 'imagens/Rosca Scott na Máquina com Barra W.gif',
+                'Rosca Spider com Barra W': 'imagens/Rosca Spider com Barra W.gif',
+                'Tríceps Francês Corda': 'imagens/Tríceps Francês Corda.gif',
+                'Mesa Flexora': 'imagens/Mesa Flexora.gif',
+                'Stiff': 'imagens/Stiff.gif',
+                'Elevação Pélvica com Barra': 'imagens/Elevação Pélvica com Barra.gif',
+                'Panturrilha em Pé Máquina': 'imagens/Panturrilha em Pé Máquina.gif',
+                'Agachamento Hack': 'imagens/Agachamento Hack.gif',
+                'Crucifixo Máquina Reto': 'imagens/Crucifixo Máquina Reto.gif',
+                'Agachamento Smith': 'imagens/Agachamento Smith.gif',
+                'Elevação Lateral Polia': 'imagens/Elevação Lateral Polia.gif'
+            };
+            
+            return exerciseImageMap[exerciseName] || 
+                   `https://placehold.co/100x100/1f2937/FFFFFF?text=${encodeURIComponent(exerciseName.split(' ')[0])}&font=inter`;
         }
         
-        // --- Manipuladores de Eventos e Inicialização ---
-        function handleCompleteWorkout() {
-            const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
-            const workoutLetter = phaseData.schedule[appState.currentDay];
+        /**
+         * Renderizar todos os componentes de uma vez
+         */
+        function renderAllComponents() {
+            renderStepperNavigation();
+            renderPhaseHeader();
+            renderDaySelector();
+            renderWorkoutDetails();
+        }
+
+        // ==========================================
+        // MANIPULADORES DE EVENTOS
+        // ==========================================
+        
+        /**
+         * Gerenciar conclusão do treino e progressão
+         */
+        function handleWorkoutCompletion() {
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
+            const workoutLetter = phaseData.schedule[APP_STATE.currentDay];
             const workout = phaseData.workouts[workoutLetter];
             if (!workout) return;
 
             const totalExercises = workout.exercises.length;
-            const completedExercises = Object.values(appState.completionStatus).filter(Boolean).length;
+            const completedExercises = Object.values(APP_STATE.completionStatus).filter(Boolean).length;
             const isWorkoutFinished = completedExercises >= totalExercises;
 
-            // Se o treino AINDA NÃO estiver finalizado (botão cinza)
+            // Se o treino ainda não foi finalizado (botão cinza)
             if (!isWorkoutFinished) {
-                // Marca todos os exercícios como completos
+                // Marca todos os exercícios como concluídos
                 workout.exercises.forEach((_, index) => {
-                    appState.completionStatus[index] = true;
+                    APP_STATE.completionStatus[index] = true;
                 });
 
-                // Salva o status de conclusão
-                const key = `week${appState.currentWeekNumber}-${appState.currentDay}`;
-                appState.allCompletions[key] = appState.completionStatus;
-                saveState();
+                // Salva status de conclusão
+                const key = `week${APP_STATE.currentWeekNumber}-${APP_STATE.currentDay}`;
+                APP_STATE.allCompletions[key] = APP_STATE.completionStatus;
+                saveApplicationState();
 
-                // Apenas renderiza novamente a visão do treino atual. Isso vai atualizar
-                // os checkboxes, a barra de progresso e a cor/texto do botão para verde.
-                renderWorkout();
-                return; // Para a execução aqui.
+                // Re-renderiza a visualização do treino
+                renderWorkoutDetails();
+                return;
             }
 
-            // Se o treino JÁ estiver finalizado (botão verde)
-            // Esta parte só será executada no segundo clique
-            myConfetti({
+            // Se o treino já foi finalizado (botão verde) - segundo clique
+            confettiInstance({
                 particleCount: 150,
                 spread: 90,
                 origin: { y: 0.6 },
                 colors: ['#f97316', '#fb923c', '#fed7aa', '#ffffff']
             });
             
-            const currentPhaseData = getPhaseDataByWeek(appState.currentWeekNumber);
+            const currentPhaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             const dayKeys = Object.keys(currentPhaseData.schedule);
-            const currentDayIndex = dayKeys.indexOf(appState.currentDay);
+            const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
 
             let nextDayIndex = currentDayIndex + 1;
             while(nextDayIndex < dayKeys.length && currentPhaseData.schedule[dayKeys[nextDayIndex]] === 'OFF') {
@@ -868,49 +1071,51 @@
             let isLastTrainingDay = !dayKeys.slice(currentDayIndex + 1).some(day => currentPhaseData.schedule[day] !== 'OFF');
 
             if (isLastTrainingDay) {
-                if (appState.highestUnlockedWeek < 12) {
-                    appState.highestUnlockedWeek++;
-                    appState.highestUnlockedDayIndex = 0;
-                    appState.currentWeekNumber = appState.highestUnlockedWeek;
-                    const nextPhaseData = getPhaseDataByWeek(appState.currentWeekNumber);
-                    appState.currentDay = Object.keys(nextPhaseData.schedule)[0];
+                if (APP_STATE.highestUnlockedWeek < 12) {
+                    APP_STATE.highestUnlockedWeek++;
+                    APP_STATE.highestUnlockedDayIndex = 0;
+                    APP_STATE.currentWeekNumber = APP_STATE.highestUnlockedWeek;
+                    const nextPhaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
+                    APP_STATE.currentDay = Object.keys(nextPhaseData.schedule)[0];
                 } else {
-                    saveState();
+                    saveApplicationState();
                     showCompletionMessage();
                     return;
                 }
             } else {
-                 appState.highestUnlockedDayIndex = nextDayIndex;
-                 appState.currentDay = dayKeys[nextDayIndex];
+                 APP_STATE.highestUnlockedDayIndex = nextDayIndex;
+                 APP_STATE.currentDay = dayKeys[nextDayIndex];
             }
             
             loadCurrentCompletionStatus();
-            saveState();
+            saveApplicationState();
             
             setTimeout(() => {
-                renderAll();
+                renderAllComponents();
                 window.scrollTo(0, 0);
             }, 300);
         }
+
+        // ==========================================
+        // FUNÇÕES DE MODAL
+        // ==========================================
         
-        function renderAll() {
-            renderStepperNav();
-            renderPhaseHeader();
-            renderDaySelector();
-            renderWorkout();
-        }
-        
-        // --- Lógica do Modal de Edição ---
+        /**
+         * Abrir o modal de edição de horários
+         */
         function openEditModal() {
-            const phaseData = getPhaseDataByWeek(appState.currentWeekNumber);
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
             if (!phaseData) return;
 
             const schedule = phaseData.schedule;
             const workouts = phaseData.workouts;
             const workoutOptions = Object.keys(workouts);
-            const dayNames = { "Seg": "Segunda", "Ter": "Terça", "Qua": "Quarta", "Qui": "Quinta", "Sex": "Sexta", "Sáb": "Sábado", "Dom": "Domingo" };
+            const dayNames = { 
+                "Seg": "Segunda", "Ter": "Terça", "Qua": "Quarta", 
+                "Qui": "Quinta", "Sex": "Sexta", "Sáb": "Sábado", "Dom": "Domingo" 
+            };
 
-            dom.editScheduleList.innerHTML = ''; // Limpa a lista
+            DOM_ELEMENTS.editScheduleList.innerHTML = '';
 
             Object.keys(schedule).forEach(dayKey => {
                 const currentWorkout = schedule[dayKey];
@@ -925,7 +1130,7 @@
                 select.id = `edit-day-${dayKey}`;
                 select.className = 'bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full col-span-3 py-1 px-2';
                 
-                // Adiciona opção de descanso
+                // Adiciona opção de dia de descanso
                 const offOption = document.createElement('option');
                 offOption.value = 'OFF';
                 offOption.textContent = 'Dia de Descanso';
@@ -942,26 +1147,32 @@
                 select.value = currentWorkout;
                 row.appendChild(label);
                 row.appendChild(select);
-                dom.editScheduleList.appendChild(row);
+                DOM_ELEMENTS.editScheduleList.appendChild(row);
             });
 
-            dom.mainContent.classList.add('blur-sm', 'scale-105');
-            dom.editScheduleModal.classList.remove('invisible', 'opacity-0');
-            dom.editScheduleCard.classList.remove('scale-95');
+            DOM_ELEMENTS.mainContent.classList.add('blur-sm', 'scale-105');
+            DOM_ELEMENTS.editScheduleModal.classList.remove('invisible', 'opacity-0');
+            DOM_ELEMENTS.editScheduleCard.classList.remove('scale-95');
         }
 
+        /**
+         * Fechar o modal de edição de horários
+         */
         function closeEditModal() {
-            dom.mainContent.classList.remove('blur-sm', 'scale-105');
-            dom.editScheduleModal.classList.add('invisible', 'opacity-0');
-            dom.editScheduleCard.classList.add('scale-95');
+            DOM_ELEMENTS.mainContent.classList.remove('blur-sm', 'scale-105');
+            DOM_ELEMENTS.editScheduleModal.classList.add('invisible', 'opacity-0');
+            DOM_ELEMENTS.editScheduleCard.classList.add('scale-95');
         }
 
+        /**
+         * Salvar alterações de horário do modal
+         */
         function saveScheduleChanges() {
-            const phaseKey = getPhaseKeyByWeek(appState.currentWeekNumber);
+            const phaseKey = getPhaseKeyByWeek(APP_STATE.currentWeekNumber);
             if (!phaseKey) return;
 
             const newSchedule = {};
-            const dayKeys = Object.keys(workoutPhases[phaseKey].schedule);
+            const dayKeys = Object.keys(WORKOUT_PHASES[phaseKey].schedule);
             let firstActiveDay = null;
             
             dayKeys.forEach(dayKey => {
@@ -969,41 +1180,33 @@
                 const newWorkout = select.value;
                 newSchedule[dayKey] = newWorkout;
                 
-                // Define o primeiro dia ativo para o qual o app deve navegar
+                // Define primeiro dia ativo para navegação
                 if (newWorkout !== 'OFF' && !firstActiveDay) {
                     firstActiveDay = dayKey;
                 }
             });
             
-            workoutPhases[phaseKey].schedule = newSchedule;
+            WORKOUT_PHASES[phaseKey].schedule = newSchedule;
             
-            // Verifica se o dia atual ainda é um dia de treino. Se não for, muda para o primeiro dia de treino disponível.
-            const currentWorkoutLetter = newSchedule[appState.currentDay];
-            if (currentWorkoutLetter === 'OFF' || !workoutPhases[phaseKey].workouts[currentWorkoutLetter]) {
-                appState.currentDay = firstActiveDay || dayKeys[0]; // Se não houver dia ativo, vai para o primeiro dia da semana
+            // Verifica se o dia atual ainda é um dia de treino
+            const currentWorkoutLetter = newSchedule[APP_STATE.currentDay];
+            if (currentWorkoutLetter === 'OFF' || !WORKOUT_PHASES[phaseKey].workouts[currentWorkoutLetter]) {
+                APP_STATE.currentDay = firstActiveDay || dayKeys[0];
             }
             
-            saveState(); // Salva o novo agendamento no localStorage
-            renderAll();
+            saveApplicationState();
+            renderAllComponents();
             closeEditModal();
         }
 
-        dom.cancelEditBtn.addEventListener('click', closeEditModal);
-        dom.saveEditBtn.addEventListener('click', saveScheduleChanges);
-        dom.editScheduleModal.addEventListener('click', (e) => {
-            if (e.target === dom.editScheduleModal) {
-                closeEditModal();
-            }
-        });
+        // ==========================================
+        // FUNCIONALIDADE DO PLAYER DE MÚSICA
+        // ==========================================
         
-        dom.completeWorkoutBtn.addEventListener('click', handleCompleteWorkout);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Inicializa o app de treinos
-            loadState();
-            renderAll();
-            
-            // --- LÓGICA DO PLAYER ---
+        /**
+         * Inicializar funcionalidade do player de música
+         */
+        function initializeMusicPlayer() {
             const openPlayerBtn = document.getElementById('open-player-btn');
             const closePlayerBtn = document.getElementById('close-player-btn');
             const playerModal = document.getElementById('player-modal');
@@ -1014,17 +1217,17 @@
             const playIcon = document.getElementById('play-icon');
             const stopIcon = document.getElementById('stop-icon');
 
-            // Lógica do Modal
+            // Lógica do modal
             const openModal = () => {
                 playerModal.classList.remove('invisible', 'opacity-0');
                 playerCard.classList.remove('scale-95');
-                dom.mainContent.classList.add('blur-sm', 'scale-105');
+                DOM_ELEMENTS.mainContent.classList.add('blur-sm', 'scale-105');
             };
 
             const closeModal = () => {
                 playerModal.classList.add('invisible', 'opacity-0');
                 playerCard.classList.add('scale-95');
-                dom.mainContent.classList.remove('blur-sm', 'scale-105');
+                DOM_ELEMENTS.mainContent.classList.remove('blur-sm', 'scale-105');
             };
 
             closePlayerBtn.addEventListener('click', closeModal);
@@ -1034,7 +1237,7 @@
                 }
             });
 
-            // --- LÓGICA DE ARRASTAR E SOLTAR O BOTÃO DE MÚSICA ---
+            // Funcionalidade de arrastar e soltar para botão flutuante
             let isDragging = false;
             let hasDragged = false;
             let startX, startY;
@@ -1045,7 +1248,6 @@
                     startX = e.touches[0].clientX;
                     startY = e.touches[0].clientY;
                 } else {
-                    // Previne o comportamento padrão do mouse (ex: arrastar imagem)
                     e.preventDefault();
                     startX = e.clientX;
                     startY = e.clientY;
@@ -1069,7 +1271,6 @@
             function dragging(e) {
                 if (!isDragging) return;
                 
-                // Previne o scroll da página no mobile
                 if (e.type === 'touchmove') {
                     e.preventDefault();
                 }
@@ -1124,19 +1325,19 @@
 
                 const centerX = btnRect.left + btnRect.width / 2;
                 
-                // Determine horizontal snap position (left or right)
+                // Determinar posição de encaixe horizontal
                 const finalLeft = (centerX < winWidth / 2) 
                     ? margin 
                     : winWidth - btnRect.width - margin;
 
-                // Define the vertical snap points based on the final *top* position of the button
+                // Definir pontos de encaixe verticais
                 const snapPointsY = [
-                    margin, // Top
-                    (winHeight / 2) - (btnRect.height / 2), // Middle
-                    winHeight - btnRect.height - margin // Bottom
+                    margin,
+                    (winHeight / 2) - (btnRect.height / 2),
+                    winHeight - btnRect.height - margin
                 ];
 
-                // Find the closest vertical snap point to the button's current top position
+                // Encontrar ponto de encaixe vertical mais próximo
                 let finalTop = snapPointsY.reduce((closest, current) => {
                     return (Math.abs(current - btnRect.top) < Math.abs(closest - btnRect.top) ? current : closest);
                 });
@@ -1149,16 +1350,15 @@
             openPlayerBtn.addEventListener('mousedown', dragStart);
             openPlayerBtn.addEventListener('touchstart', dragStart);
 
-            // Lógica do Player
+            // Lógica do player de áudio
             let isPlaying = false;
 
             const togglePlay = () => {
                 if (isPlaying) {
-                    audio.pause(); // Pausa o stream
+                    audio.pause();
                 } else {
-                    // Força o reload do stream para reconectar
                     audio.load();
-                    audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
+                    audio.play().catch(e => console.error("Error playing audio:", e));
                 }
             };
             
@@ -1167,14 +1367,58 @@
                 stopIcon.classList.toggle('hidden', !isPlaying);
             };
 
-            // Event Listeners para o Player
+            // Ouvintes de eventos de áudio
             playPauseBtn.addEventListener('click', togglePlay);
             audio.addEventListener('play', () => { isPlaying = true; updatePlayPauseIcon(); });
             audio.addEventListener('pause', () => { isPlaying = false; updatePlayPauseIcon(); });
 
-            // Define volume inicial para 100% (máximo permitido pelo navegador)
+            // Define volume inicial
             audio.volume = 1.0;
-        });
+        }
+
+        // ==========================================
+        // INICIALIZAÇÃO DA APLICAÇÃO
+        // ==========================================
+        
+        /**
+         * Inicializar a aplicação
+         */
+        function initializeApplication() {
+            // Carregar estado salvo
+            loadApplicationState();
+            
+            // Renderizar todos os componentes
+            renderAllComponents();
+            
+            // Configurar ouvintes de eventos com performance melhorada
+            setupEventListeners();
+            
+            // Inicializar player de música
+            initializeMusicPlayer();
+        }
+
+        /**
+         * Configurar todos os ouvintes de eventos para melhor performance
+         */
+        function setupEventListeners() {
+            // Botão de ação principal
+            DOM_ELEMENTS.completeWorkoutBtn.addEventListener('click', handleWorkoutCompletion);
+            
+            // Ouvintes de eventos do modal
+            DOM_ELEMENTS.cancelEditBtn.addEventListener('click', closeEditModal);
+            DOM_ELEMENTS.saveEditBtn.addEventListener('click', saveScheduleChanges);
+            DOM_ELEMENTS.editScheduleModal.addEventListener('click', (e) => {
+                if (e.target === DOM_ELEMENTS.editScheduleModal) {
+                    closeEditModal();
+                }
+            });
+            
+            // Delegação de eventos para alternância de conclusão de exercícios
+            DOM_ELEMENTS.workoutDetails.addEventListener('click', handleExerciseToggle);
+        }
+
+        // Iniciar a aplicação quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', initializeApplication);
     </script>
 </body>
 </html>
