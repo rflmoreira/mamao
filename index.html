@@ -576,6 +576,35 @@
         }
 
         /**
+         * Atualizar índices de progresso após alterações no cronograma
+         */
+        function updateProgressAfterScheduleChange() {
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
+            if (!phaseData) return;
+
+            const dayKeys = Object.keys(phaseData.schedule);
+            const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
+            
+            // Se estivermos na semana atual de progresso máximo, atualize o índice
+            if (APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek) {
+                // Encontrar o novo índice do dia atual no cronograma atualizado
+                if (currentDayIndex !== -1) {
+                    APP_STATE.highestUnlockedDayIndex = currentDayIndex;
+                } else {
+                    // Se o dia atual não existe mais, encontrar o primeiro dia ativo
+                    let firstActiveDayIndex = 0;
+                    for (let i = 0; i < dayKeys.length; i++) {
+                        if (phaseData.schedule[dayKeys[i]] !== 'OFF') {
+                            firstActiveDayIndex = i;
+                            break;
+                        }
+                    }
+                    APP_STATE.highestUnlockedDayIndex = firstActiveDayIndex;
+                }
+            }
+        }
+
+        /**
          * Resetar o estado da aplicação para os valores iniciais
          */
         function resetApplicationState() {
@@ -1330,6 +1359,9 @@
             if (currentWorkoutLetter === 'OFF' || !WORKOUT_PHASES[phaseKey].workouts[currentWorkoutLetter]) {
                 APP_STATE.currentDay = firstActiveDay || dayKeys[0];
             }
+            
+            // Atualizar índices de progresso após mudanças no cronograma
+            updateProgressAfterScheduleChange();
             
             saveApplicationState();
             renderAllComponents();
