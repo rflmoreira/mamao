@@ -769,7 +769,38 @@
                 } else if (APP_STATE.currentDay === day) {
                     buttonClasses += 'bg-orange-600 text-white';
                 } else {
-                    buttonClasses += 'bg-gray-700 text-gray-400 hover:bg-gray-600';
+                    // Verificar status de conclusão do treino para este dia
+                    const workoutKey = `week${APP_STATE.currentWeekNumber}-${day}`;
+                    const dayCompletions = APP_STATE.allCompletions[workoutKey] || {};
+                    const workout = phaseData.workouts[workoutLetter];
+                    
+                    if (workout) {
+                        const totalExercises = workout.exercises.length;
+                        const completedExercises = Object.values(dayCompletions).filter(Boolean).length;
+                        const hasStartedWorkout = completedExercises > 0;
+                        
+                        // Verificar se este treino foi oficialmente concluído (usuário avançou no programa)
+                        const currentDayIndex = dayKeys.indexOf(day);
+                        const wasOfficiallyCompleted = (
+                            // Se estamos em uma semana passada, todos os treinos foram oficialmente concluídos
+                            APP_STATE.currentWeekNumber < APP_STATE.highestUnlockedWeek ||
+                            // Se estamos na semana atual, apenas os dias antes do progresso atual foram oficialmente concluídos
+                            (APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek && currentDayIndex < APP_STATE.highestUnlockedDayIndex)
+                        );
+                        
+                        if (wasOfficiallyCompleted && completedExercises >= totalExercises) {
+                            // Treino oficialmente concluído - verde
+                            buttonClasses += 'bg-green-600 text-white hover:bg-green-500';
+                        } else if (hasStartedWorkout) {
+                            // Treino iniciado mas não oficialmente concluído - vermelho
+                            buttonClasses += 'bg-red-600 text-white hover:bg-red-500';
+                        } else {
+                            // Treino não iniciado - cinza padrão
+                            buttonClasses += 'bg-gray-700 text-gray-400 hover:bg-gray-600';
+                        }
+                    } else {
+                        buttonClasses += 'bg-gray-700 text-gray-400 hover:bg-gray-600';
+                    }
                 }
 
                 button.className = buttonClasses;
@@ -850,10 +881,23 @@
          * @param {boolean} allDone - Se todos os exercícios estão concluídos
          */
         function updateWorkoutButton(allDone) {
+            // Verificar se é um treino passado (não é o treino atual do progresso)
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
+            const dayKeys = Object.keys(phaseData.schedule);
+            const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
+            const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
+                               currentDayIndex === APP_STATE.highestUnlockedDayIndex;
+            
             if (allDone) {
                 DOM_ELEMENTS.completeWorkoutBtn.classList.remove('bg-gray-600/80', 'hover:bg-gray-500');
                 DOM_ELEMENTS.completeWorkoutBtn.classList.add('bg-green-600/80', 'hover:bg-green-500');
-                DOM_ELEMENTS.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-arrow-right text-2xl' aria-hidden="true"></i> Avançar Treino`;
+                
+                // Se não é o treino atual, mostrar "Treino Feito", senão "Avançar Treino"
+                if (!isCurrentProgressDay) {
+                    DOM_ELEMENTS.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-check-circle text-2xl' aria-hidden="true"></i> Treino Feito`;
+                } else {
+                    DOM_ELEMENTS.completeWorkoutBtn.innerHTML = `<i class='ph-bold ph-arrow-right text-2xl' aria-hidden="true"></i> Avançar Treino`;
+                }
             } else {
                 DOM_ELEMENTS.completeWorkoutBtn.classList.remove('bg-green-600/80', 'hover:bg-green-500');
                 DOM_ELEMENTS.completeWorkoutBtn.classList.add('bg-gray-600/80', 'hover:bg-gray-500');
@@ -887,6 +931,17 @@
          */
         function createExerciseCard(exercise, index) {
             const isCompleted = APP_STATE.completionStatus[index];
+            
+            // Verificar se é um treino passado (não é o treino atual do progresso)
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
+            const dayKeys = Object.keys(phaseData.schedule);
+            const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
+            const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
+                               currentDayIndex === APP_STATE.highestUnlockedDayIndex;
+            
+            // Se não é o treino atual E está concluído, não permitir interação
+            const isLocked = !isCurrentProgressDay && isCompleted;
+            
             const card = document.createElement('div');
             card.className = `bg-gray-800 rounded-xl shadow-lg border border-gray-700 transition-all duration-300 flex flex-col ${isCompleted ? 'exercise-completed' : ''}`;
             
@@ -921,14 +976,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="completion-toggle-wrapper p-4 bg-gray-900/50 rounded-b-xl mt-auto flex items-center justify-center cursor-pointer transition-colors duration-300 hover:bg-gray-700/50" data-index="${index}">
+                <div class="completion-toggle-wrapper p-4 bg-gray-900/50 rounded-b-xl mt-auto flex items-center justify-center ${isLocked ? 'cursor-not-allowed opacity-75' : 'cursor-pointer hover:bg-gray-700/50'} transition-colors duration-300" data-index="${index}">
                     <div class="animated-check-container ${isCompleted ? 'completed' : ''}">
                         <svg class="animated-check-svg" viewBox="0 0 24 24">
                             <circle class="animated-check-circle" cx="12" cy="12" r="10"/>
                             <path class="animated-check-path" d="M7 13l3 3 7-7"/>
                         </svg>
                     </div>
-                    <span class="ml-3 font-bold text-lg transition-colors duration-300 ${isCompleted ? 'text-green-400' : 'text-gray-300'}">${isCompleted ? 'Concluído!' : 'Marcar como Concluído'}</span>
+                    <span class="ml-3 font-bold text-lg transition-colors duration-300 ${isCompleted ? 'text-green-400' : 'text-gray-300'}">${isCompleted ? (isLocked ? 'Exercício Concluído' : 'Concluído!') : 'Marcar como Concluído'}</span>
                 </div>
             `;
             
@@ -944,6 +999,19 @@
             if (!toggleWrapper) return;
             
             const index = parseInt(toggleWrapper.dataset.index);
+            
+            // Verificar se é um treino passado (não é o treino atual do progresso)
+            const phaseData = getPhaseDataByWeek(APP_STATE.currentWeekNumber);
+            const dayKeys = Object.keys(phaseData.schedule);
+            const currentDayIndex = dayKeys.indexOf(APP_STATE.currentDay);
+            const isCurrentProgressDay = APP_STATE.currentWeekNumber === APP_STATE.highestUnlockedWeek &&
+                               currentDayIndex === APP_STATE.highestUnlockedDayIndex;
+            
+            // Se não é o treino atual E o exercício já está concluído, não permitir desmarcar
+            if (!isCurrentProgressDay && APP_STATE.completionStatus[index]) {
+                return; // Bloqueia a desmarcação
+            }
+            
             APP_STATE.completionStatus[index] = !APP_STATE.completionStatus[index];
             const key = `week${APP_STATE.currentWeekNumber}-${APP_STATE.currentDay}`;
             APP_STATE.allCompletions[key] = APP_STATE.completionStatus;
